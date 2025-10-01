@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workflow xmlns="http://soap.sforce.com/2006/04/metadata">
+    <alerts>
+        <fullName>Registration_Confirmation</fullName>
+        <description>Registration Confirmation</description>
+        <protected>false</protected>
+        <recipients>
+            <field>Customer_Email__c</field>
+            <type>email</type>
+        </recipients>
+        <senderAddress>customer.care@runwalgroup.in</senderAddress>
+        <senderType>OrgWideEmailAddress</senderType>
+        <template>My_View/Registration_Confirmation</template>
+    </alerts>
+    <alerts>
+        <fullName>Registration_Schedule_Email</fullName>
+        <description>Registration Schedule Email</description>
+        <protected>false</protected>
+        <recipients>
+            <field>Customer_Email__c</field>
+            <type>email</type>
+        </recipients>
+        <senderAddress>customer.care@runwalgroup.in</senderAddress>
+        <senderType>OrgWideEmailAddress</senderType>
+        <template>My_View/Registration_Schedule_Email</template>
+    </alerts>
+    <alerts>
+        <fullName>Registration_Schedule_Email_Runwal_Gardens</fullName>
+        <description>Registration Schedule Email Runwal Gardens</description>
+        <protected>false</protected>
+        <recipients>
+            <field>Customer_Email__c</field>
+            <type>email</type>
+        </recipients>
+        <senderAddress>customer.care@runwalgroup.in</senderAddress>
+        <senderType>OrgWideEmailAddress</senderType>
+        <template>My_View/Registration_Schedule_Email</template>
+    </alerts>
+</Workflow>
