@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>RW_Sub_Type__c</fullName>
+    <label>Sub Type</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>Type</controllingField>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>99 Acres</fullName>
+                <default>false</default>
+                <label>99 Acres</label>
+            </value>
+            <value>
+                <fullName>Hoarding</fullName>
+                <default>false</default>
+                <label>Hoarding</label>
+            </value>
+            <value>
+                <fullName>Gantry</fullName>
+                <default>false</default>
+                <label>Gantry</label>
+            </value>
+            <value>
+                <fullName>Transport Branding</fullName>
+                <default>false</default>
+                <label>Transport Branding</label>
+            </value>
+            <value>
+                <fullName>Newspaper</fullName>
+                <default>false</default>
+                <label>Newspaper</label>
+            </value>
+            <value>
+                <fullName>Journal</fullName>
+                <default>false</default>
+                <label>Journal</label>
+            </value>
+            <value>
+                <fullName>Magazine</fullName>
+                <default>false</default>
+                <label>Magazine</label>
+            </value>
+            <value>
+                <fullName>Purchased Data</fullName>
+                <default>false</default>
+                <label>Purchased Data</label>
+            </value>
+            <value>
+                <fullName>Dead Lead Harvesting</fullName>
+                <default>false</default>
+                <label>Dead Lead Harvesting</label>
+            </value>
+            <value>
+                <fullName>RCP</fullName>
+                <default>false</default>
+                <label>RCP</label>
+            </value>
+            <value>
+                <fullName>ICP</fullName>
+                <default>false</default>
+                <label>ICP</label>
+            </value>
+            <value>
+                <fullName>AOP</fullName>
+                <default>false</default>
+                <label>AOP</label>
+            </value>
+            <value>
+                <fullName>NRI</fullName>
+                <default>false</default>
+                <label>NRI</label>
+            </value>
+            <value>
+                <fullName>Customer Referral</fullName>
+                <default>false</default>
+                <label>Customer Referral</label>
+            </value>
+            <value>
+                <fullName>Enquiry Referral</fullName>
+                <default>false</default>
+                <label>Enquiry Referral</label>
+            </value>
+            <value>
+                <fullName>Employee Referral</fullName>
+                <default>false</default>
+                <label>Employee Referral</label>
+            </value>
+            <value>
+                <fullName>Management Referral</fullName>
+                <default>false</default>
+                <label>Management Referral</label>
+            </value>
+            <value>
+                <fullName>Loyalty</fullName>
+                <default>false</default>
+                <label>Loyalty</label>
+            </value>
+            <value>
+                <fullName>Events</fullName>
+                <default>false</default>
+                <label>Events</label>
+            </value>
+            <value>
+                <fullName>Emailer</fullName>
+                <default>false</default>
+                <label>Emailer</label>
+            </value>
+            <value>
+                <fullName>Cold Outreach</fullName>
+                <default>false</default>
+                <label>Cold Outreach</label>
+            </value>
+        </valueSetDefinition>
+        <valueSettings>
+            <controllingFieldValue>Channel Partner</controllingFieldValue>
+            <valueName>RCP</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Channel Partner</controllingFieldValue>
+            <valueName>ICP</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Channel Partner</controllingFieldValue>
+            <valueName>AOP</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Channel Partner</controllingFieldValue>
+            <valueName>NRI</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Referral &amp; Loyalty</controllingFieldValue>
+            <valueName>Customer Referral</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Referral &amp; Loyalty</controllingFieldValue>
+            <valueName>Enquiry Referral</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Referral &amp; Loyalty</controllingFieldValue>
+            <valueName>Employee Referral</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Referral &amp; Loyalty</controllingFieldValue>
+            <valueName>Management Referral</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Referral &amp; Loyalty</controllingFieldValue>
+            <valueName>Loyalty</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Referral &amp; Loyalty</controllingFieldValue>
+            <controllingFieldValue>Corporate Outreach</controllingFieldValue>
+            <valueName>Events</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Cold Outreach</controllingFieldValue>
+            <valueName>Purchased Data</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Cold Outreach</controllingFieldValue>
+            <valueName>Dead Lead Harvesting</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>OOH</controllingFieldValue>
+            <valueName>Hoarding</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>OOH</controllingFieldValue>
+            <valueName>Gantry</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>OOH</controllingFieldValue>
+            <valueName>Transport Branding</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Corporate Outreach</controllingFieldValue>
+            <valueName>Emailer</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Corporate Outreach</controllingFieldValue>
+            <valueName>Cold Outreach</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Print</controllingFieldValue>
+            <valueName>Newspaper</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Print</controllingFieldValue>
+            <valueName>Journal</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Print</controllingFieldValue>
+            <valueName>Magazine</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>

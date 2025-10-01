@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Sales_Manager__c</fullName>
+    <label>Sales Manager</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <trackHistory>false</trackHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Aakash Chavan</fullName>
+                <default>false</default>
+                <label>Aakash Chavan</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

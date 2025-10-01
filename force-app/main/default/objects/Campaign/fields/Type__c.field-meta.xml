@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Type__c</fullName>
+    <label>Type</label>
+    <required>false</required>
+    <trackFeedHistory>false</trackFeedHistory>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>ATL</fullName>
+                <default>false</default>
+                <label>ATL</label>
+            </value>
+            <value>
+                <fullName>BTL</fullName>
+                <default>false</default>
+                <label>BTL</label>
+            </value>
+            <value>
+                <fullName>TTL</fullName>
+                <default>false</default>
+                <label>TTL</label>
+            </value>
+            <value>
+                <fullName>CP Meets</fullName>
+                <default>false</default>
+                <label>CP Meets</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

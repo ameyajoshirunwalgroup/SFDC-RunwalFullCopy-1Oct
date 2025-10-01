@@ -1,0 +1,602 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Call_Disposition_Custom__c</fullName>
+    <label>Call Sub Status</label>
+    <required>false</required>
+    <type>Picklist</type>
+    <valueSet>
+        <controllingField>Call_Status__c</controllingField>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Account/ADF/Tax Statement</fullName>
+                <default>false</default>
+                <label>Account/ADF/Tax Statement</label>
+            </value>
+            <value>
+                <fullName>Activate DND on my account</fullName>
+                <default>false</default>
+                <label>Activate DND on my account</label>
+            </value>
+            <value>
+                <fullName>Add/remove/edit applicants</fullName>
+                <default>false</default>
+                <label>Add/remove/edit applicants</label>
+            </value>
+            <value>
+                <fullName>Agreement clauses</fullName>
+                <default>false</default>
+                <label>Agreement clauses</label>
+            </value>
+            <value>
+                <fullName>Amount paid not reflecting/incorrect</fullName>
+                <default>false</default>
+                <label>Amount paid not reflecting/incorrect</label>
+            </value>
+            <value>
+                <fullName>Bank Account details for making payment</fullName>
+                <default>false</default>
+                <label>Bank Account details for making payment</label>
+            </value>
+            <value>
+                <fullName>Book another unit/upgrade to new unit</fullName>
+                <default>false</default>
+                <label>Book another unit/upgrade to new unit</label>
+            </value>
+            <value>
+                <fullName>Call disconnected</fullName>
+                <default>false</default>
+                <label>Call disconnected</label>
+            </value>
+            <value>
+                <fullName>Can&apos;t login - forgot username/password</fullName>
+                <default>false</default>
+                <label>Can&apos;t login - forgot username/password</label>
+            </value>
+            <value>
+                <fullName>Cancellation process</fullName>
+                <default>false</default>
+                <label>Cancellation process</label>
+            </value>
+            <value>
+                <fullName>Cancellation Refund request</fullName>
+                <default>false</default>
+                <label>Cancellation Refund request</label>
+            </value>
+            <value>
+                <fullName>Cancellation request</fullName>
+                <default>false</default>
+                <label>Cancellation request</label>
+            </value>
+            <value>
+                <fullName>Clarification of documents received</fullName>
+                <default>false</default>
+                <label>Clarification of documents received</label>
+            </value>
+            <value>
+                <fullName>Clarification on Demand Letter</fullName>
+                <default>false</default>
+                <label>Clarification on Demand Letter</label>
+            </value>
+            <value>
+                <fullName>Clarification on payment receipt</fullName>
+                <default>false</default>
+                <label>Clarification on payment receipt</label>
+            </value>
+            <value>
+                <fullName>Collection email</fullName>
+                <default>false</default>
+                <label>Collection email</label>
+            </value>
+            <value>
+                <fullName>Compensation for delay in possession</fullName>
+                <default>false</default>
+                <label>Compensation for delay in possession</label>
+            </value>
+            <value>
+                <fullName>Demand due date and outstanding amount</fullName>
+                <default>false</default>
+                <label>Demand due date and outstanding amount</label>
+            </value>
+            <value>
+                <fullName>Demand Letter</fullName>
+                <default>false</default>
+                <label>Demand Letter</label>
+            </value>
+            <value>
+                <fullName>DND active but promotion received</fullName>
+                <default>false</default>
+                <label>DND active but promotion received</label>
+            </value>
+            <value>
+                <fullName>Documents required on registration day</fullName>
+                <default>false</default>
+                <label>Documents required on registration day</label>
+            </value>
+            <value>
+                <fullName>Duplicate demand letter</fullName>
+                <default>false</default>
+                <label>Duplicate demand letter</label>
+            </value>
+            <value>
+                <fullName>Error while login</fullName>
+                <default>false</default>
+                <label>Error while login</label>
+            </value>
+            <value>
+                <fullName>Excess Refund request</fullName>
+                <default>false</default>
+                <label>Excess Refund request</label>
+            </value>
+            <value>
+                <fullName>Expected possession date</fullName>
+                <default>false</default>
+                <label>Expected possession date</label>
+            </value>
+            <value>
+                <fullName>Flat readiness for possession (fully paid)</fullName>
+                <default>false</default>
+                <label>Flat readiness for possession (fully paid)</label>
+            </value>
+            <value>
+                <fullName>Flat readiness for possession post PDL + 60 days (High End)</fullName>
+                <default>false</default>
+                <label>Flat readiness for possession post PDL + 60 days (High End)</label>
+            </value>
+            <value>
+                <fullName>Getting the registered agreement</fullName>
+                <default>false</default>
+                <label>Getting the registered agreement</label>
+            </value>
+            <value>
+                <fullName>GST charged on my account</fullName>
+                <default>false</default>
+                <label>GST charged on my account</label>
+            </value>
+            <value>
+                <fullName>Home loan services provided by Runwal</fullName>
+                <default>false</default>
+                <label>Home loan services provided by Runwal</label>
+            </value>
+            <value>
+                <fullName>I can&apos;t be present for possession (POA)</fullName>
+                <default>false</default>
+                <label>I can&apos;t be present for possession (POA)</label>
+            </value>
+            <value>
+                <fullName>I can&apos;t be present for registration (POA)</fullName>
+                <default>false</default>
+                <label>I can&apos;t be present for registration (POA)</label>
+            </value>
+            <value>
+                <fullName>I can&apos;t register in 30 days from booking</fullName>
+                <default>false</default>
+                <label>I can&apos;t register in 30 days from booking</label>
+            </value>
+            <value>
+                <fullName>Income tax notice received</fullName>
+                <default>false</default>
+                <label>Income tax notice received</label>
+            </value>
+            <value>
+                <fullName>Interest waiver receipt</fullName>
+                <default>false</default>
+                <label>Interest waiver receipt</label>
+            </value>
+            <value>
+                <fullName>Knowing demand letter/society charges</fullName>
+                <default>false</default>
+                <label>Knowing demand letter/society charges</label>
+            </value>
+            <value>
+                <fullName>Legal notice</fullName>
+                <default>false</default>
+                <label>Legal notice</label>
+            </value>
+            <value>
+                <fullName>LFC Email</fullName>
+                <default>false</default>
+                <label>LFC Email</label>
+            </value>
+            <value>
+                <fullName>Loan document request</fullName>
+                <default>false</default>
+                <label>Loan document request</label>
+            </value>
+            <value>
+                <fullName>Loan documents - sanction/disbursal</fullName>
+                <default>false</default>
+                <label>Loan documents - sanction/disbursal</label>
+            </value>
+            <value>
+                <fullName>Loan status update</fullName>
+                <default>false</default>
+                <label>Loan status update</label>
+            </value>
+            <value>
+                <fullName>News related to Runwal</fullName>
+                <default>false</default>
+                <label>News related to Runwal</label>
+            </value>
+            <value>
+                <fullName>Offers given at the time of booking</fullName>
+                <default>false</default>
+                <label>Offers given at the time of booking</label>
+            </value>
+            <value>
+                <fullName>Other documents</fullName>
+                <default>false</default>
+                <label>Other documents</label>
+            </value>
+            <value>
+                <fullName>Parking related</fullName>
+                <default>false</default>
+                <label>Parking related</label>
+            </value>
+            <value>
+                <fullName>Payment modes available</fullName>
+                <default>false</default>
+                <label>Payment modes available</label>
+            </value>
+            <value>
+                <fullName>Payment receipt request</fullName>
+                <default>false</default>
+                <label>Payment receipt request</label>
+            </value>
+            <value>
+                <fullName>Police complaint received</fullName>
+                <default>false</default>
+                <label>Police complaint received</label>
+            </value>
+            <value>
+                <fullName>Possession Email</fullName>
+                <default>false</default>
+                <label>Possession Email</label>
+            </value>
+            <value>
+                <fullName>Possession process</fullName>
+                <default>false</default>
+                <label>Possession process</label>
+            </value>
+            <value>
+                <fullName>Post BA2</fullName>
+                <default>false</default>
+                <label>Post BA2</label>
+            </value>
+            <value>
+                <fullName>Post possession support</fullName>
+                <default>false</default>
+                <label>Post possession support</label>
+            </value>
+            <value>
+                <fullName>Pre BA2</fullName>
+                <default>false</default>
+                <label>Pre BA2</label>
+            </value>
+            <value>
+                <fullName>Prepay possession dues</fullName>
+                <default>false</default>
+                <label>Prepay possession dues</label>
+            </value>
+            <value>
+                <fullName>Pricing or Payment schedule related</fullName>
+                <default>false</default>
+                <label>Pricing or Payment schedule related</label>
+            </value>
+            <value>
+                <fullName>Receipts</fullName>
+                <default>false</default>
+                <label>Receipts</label>
+            </value>
+            <value>
+                <fullName>Redeem my priva points</fullName>
+                <default>false</default>
+                <label>Redeem my priva points</label>
+            </value>
+            <value>
+                <fullName>Refer a friend/family</fullName>
+                <default>false</default>
+                <label>Refer a friend/family</label>
+            </value>
+            <value>
+                <fullName>Referral benefit related</fullName>
+                <default>false</default>
+                <label>Referral benefit related</label>
+            </value>
+            <value>
+                <fullName>Registration/Stamp duty payment process</fullName>
+                <default>false</default>
+                <label>Registration/Stamp duty payment process</label>
+            </value>
+            <value>
+                <fullName>Registration Email</fullName>
+                <default>false</default>
+                <label>Registration Email</label>
+            </value>
+            <value>
+                <fullName>Remove DND on my account</fullName>
+                <default>false</default>
+                <label>Remove DND on my account</label>
+            </value>
+            <value>
+                <fullName>Request call back from LFC</fullName>
+                <default>false</default>
+                <label>Request call back from LFC</label>
+            </value>
+            <value>
+                <fullName>Revised demand without interest</fullName>
+                <default>false</default>
+                <label>Revised demand without interest</label>
+            </value>
+            <value>
+                <fullName>ROC</fullName>
+                <default>false</default>
+                <label>ROC</label>
+            </value>
+            <value>
+                <fullName>ROC request</fullName>
+                <default>false</default>
+                <label>ROC request</label>
+            </value>
+            <value>
+                <fullName>Scheduling key handover</fullName>
+                <default>false</default>
+                <label>Scheduling key handover</label>
+            </value>
+            <value>
+                <fullName>Scheduling my registration</fullName>
+                <default>false</default>
+                <label>Scheduling my registration</label>
+            </value>
+            <value>
+                <fullName>Share details of payments made</fullName>
+                <default>false</default>
+                <label>Share details of payments made</label>
+            </value>
+            <value>
+                <fullName>Site visit related</fullName>
+                <default>false</default>
+                <label>Site visit related</label>
+            </value>
+            <value>
+                <fullName>Spoke to customer</fullName>
+                <default>false</default>
+                <label>Spoke to customer</label>
+            </value>
+            <value>
+                <fullName>TDS applicability on my booking</fullName>
+                <default>false</default>
+                <label>TDS applicability on my booking</label>
+            </value>
+            <value>
+                <fullName>TDS Challan</fullName>
+                <default>false</default>
+                <label>TDS Challan</label>
+            </value>
+            <value>
+                <fullName>TDS Challan/26QB/26AS related</fullName>
+                <default>false</default>
+                <label>TDS Challan/26QB/26AS related</label>
+            </value>
+            <value>
+                <fullName>TDS payment - Self or through Runwal</fullName>
+                <default>false</default>
+                <label>TDS payment - Self or through Runwal</label>
+            </value>
+            <value>
+                <fullName>Transfer/Upgrade to another unit</fullName>
+                <default>false</default>
+                <label>Transfer/Upgrade to another unit</label>
+            </value>
+            <value>
+                <fullName>Unable to access info/wrong/missing info</fullName>
+                <default>false</default>
+                <label>Unable to access info/wrong/missing info</label>
+            </value>
+            <value>
+                <fullName>Unable to connect with Runwal team</fullName>
+                <default>false</default>
+                <label>Unable to connect with Runwal team</label>
+            </value>
+            <value>
+                <fullName>Unit orientation/layout related</fullName>
+                <default>false</default>
+                <label>Unit orientation/layout related</label>
+            </value>
+            <value>
+                <fullName>Update address/phone number/email</fullName>
+                <default>false</default>
+                <label>Update address/phone number/email</label>
+            </value>
+            <value>
+                <fullName>Update PAN details</fullName>
+                <default>false</default>
+                <label>Update PAN details</label>
+            </value>
+            <value>
+                <fullName>View draft agreement</fullName>
+                <default>false</default>
+                <label>View draft agreement</label>
+            </value>
+            <value>
+                <fullName>Waiver Request</fullName>
+                <default>false</default>
+                <label>Waiver Request</label>
+            </value>
+            <value>
+                <fullName>Welcome Email</fullName>
+                <default>false</default>
+                <label>Welcome Email</label>
+            </value>
+            <value>
+                <fullName>What do I need to pay at possession?</fullName>
+                <default>false</default>
+                <label>What do I need to pay at possession?</label>
+            </value>
+            <value>
+                <fullName>What is expected on day of key handover?</fullName>
+                <default>false</default>
+                <label>What is expected on day of key handover?</label>
+            </value>
+            <value>
+                <fullName>BCAM / FCAM / society charges</fullName>
+                <default>false</default>
+                <label>BCAM / FCAM / society charges</label>
+            </value>
+            <value>
+                <fullName>SDR related customer paid</fullName>
+                <default>false</default>
+                <label>SDR related customer paid</label>
+            </value>
+            <value>
+                <fullName>SDR related Runwal paid</fullName>
+                <default>false</default>
+                <label>SDR related Runwal paid</label>
+            </value>
+            <value>
+                <fullName>Registration Vendor Related</fullName>
+                <default>false</default>
+                <label>Registration Vendor Related</label>
+            </value>
+            <value>
+                <fullName>Sanction letter</fullName>
+                <default>false</default>
+                <label>Sanction letter</label>
+            </value>
+            <value>
+                <fullName>home loan  Email</fullName>
+                <default>false</default>
+                <label>home loan  Email</label>
+            </value>
+            <value>
+                <fullName>Customer informed</fullName>
+                <default>false</default>
+                <label>Customer informed</label>
+            </value>
+            <value>
+                <fullName>customer not contactable</fullName>
+                <default>false</default>
+                <label>customer not contactable</label>
+            </value>
+            <value>
+                <fullName>Call Back Later</fullName>
+                <default>false</default>
+                <label>Call Back Later</label>
+            </value>
+            <value>
+                <fullName>Interested</fullName>
+                <default>false</default>
+                <label>Interested</label>
+            </value>
+            <value>
+                <fullName>Visit Scheduled</fullName>
+                <default>false</default>
+                <label>Visit Scheduled</label>
+            </value>
+            <value>
+                <fullName>Lost</fullName>
+                <default>false</default>
+                <label>Lost</label>
+            </value>
+            <value>
+                <fullName>Junk</fullName>
+                <default>false</default>
+                <label>Junk</label>
+            </value>
+            <value>
+                <fullName>Not Answering</fullName>
+                <default>false</default>
+                <label>Not Answering</label>
+            </value>
+            <value>
+                <fullName>Disconnected while Ringing</fullName>
+                <default>false</default>
+                <label>Disconnected while Ringing</label>
+            </value>
+            <value>
+                <fullName>Number Busy</fullName>
+                <default>false</default>
+                <label>Number Busy</label>
+            </value>
+            <value>
+                <fullName>Switched Off</fullName>
+                <default>false</default>
+                <label>Switched Off</label>
+            </value>
+            <value>
+                <fullName>Not Reachable</fullName>
+                <default>false</default>
+                <label>Not Reachable</label>
+            </value>
+            <value>
+                <fullName>IVR_Invalid Number</fullName>
+                <default>false</default>
+                <label>IVR_Invalid Number</label>
+            </value>
+            <value>
+                <fullName>Temporarily Disconnected</fullName>
+                <default>false</default>
+                <label>Temporarily Disconnected</label>
+            </value>
+            <value>
+                <fullName>Incoming Calls Barred</fullName>
+                <default>false</default>
+                <label>Incoming Calls Barred</label>
+            </value>
+        </valueSetDefinition>
+        <valueSettings>
+            <controllingFieldValue>Not Connected</controllingFieldValue>
+            <controllingFieldValue>Connected</controllingFieldValue>
+            <valueName>Lost</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Not Connected</controllingFieldValue>
+            <controllingFieldValue>Connected</controllingFieldValue>
+            <valueName>Junk</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Not Connected</controllingFieldValue>
+            <valueName>Not Answering</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Not Connected</controllingFieldValue>
+            <valueName>Disconnected while Ringing</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Not Connected</controllingFieldValue>
+            <valueName>Number Busy</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Not Connected</controllingFieldValue>
+            <valueName>Switched Off</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Not Connected</controllingFieldValue>
+            <valueName>Not Reachable</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Not Connected</controllingFieldValue>
+            <valueName>IVR_Invalid Number</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Not Connected</controllingFieldValue>
+            <valueName>Temporarily Disconnected</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Not Connected</controllingFieldValue>
+            <valueName>Incoming Calls Barred</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Connected</controllingFieldValue>
+            <valueName>Call Back Later</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Connected</controllingFieldValue>
+            <valueName>Interested</valueName>
+        </valueSettings>
+        <valueSettings>
+            <controllingFieldValue>Connected</controllingFieldValue>
+            <valueName>Visit Scheduled</valueName>
+        </valueSettings>
+    </valueSet>
+</CustomField>
