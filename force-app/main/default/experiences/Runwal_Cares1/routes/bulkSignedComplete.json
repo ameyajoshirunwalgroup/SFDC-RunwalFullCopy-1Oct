@@ -1,0 +1,12 @@
+{
+  "activeViewId" : "618f361d-668b-4a99-b154-5c1aa59fb44d",
+  "appPageId" : "55e0b7c3-0717-42c4-9566-d5f906bed081",
+  "configurationTags" : [ ],
+  "devName" : "bulkSignedComplete__c",
+  "id" : "a2949028-89d2-4fe9-89d6-d19a9121e72d",
+  "label" : "bulkSignedComplete",
+  "pageAccess" : "UseParent",
+  "routeType" : "custom-bulksignedcomplete",
+  "type" : "route",
+  "urlPrefix" : "bulksignedcomplete"
+}

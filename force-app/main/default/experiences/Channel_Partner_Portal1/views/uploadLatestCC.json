@@ -1,0 +1,46 @@
+{
+  "appPageId" : "5f3496ad-333d-4427-9210-776490b7cc27",
+  "componentName" : "siteforce:sldsOneColLayout",
+  "dataProviders" : [ ],
+  "id" : "f9a330c1-0990-4934-aaa3-b2cc54104e8c",
+  "label" : "Upload Latest CC",
+  "regions" : [ {
+    "id" : "e7d51363-4d62-4372-a826-4245f9045bd4",
+    "regionName" : "header",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : { },
+      "componentName" : "c:cpuploadRERAnCC",
+      "id" : "af5c228c-11aa-4eb5-8a15-2acd99a1fa76",
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "63ec636c-c10b-4718-be5d-5866bacb992c",
+    "regionName" : "content",
+    "type" : "region"
+  }, {
+    "id" : "097932e0-5ab1-4e0f-ad9a-6e4d95f59c40",
+    "regionName" : "footer",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "customHeadTags" : "",
+        "description" : "",
+        "title" : "Upload Latest CC"
+      },
+      "componentName" : "forceCommunity:seoAssistant",
+      "id" : "bf6a9c62-a7f5-43e5-b94c-24499b649119",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "a5fc114e-4cc9-47b3-a206-32bc4b48fa55",
+    "regionName" : "sfdcHiddenRegion",
+    "type" : "region"
+  } ],
+  "themeLayoutType" : "Inner",
+  "type" : "view",
+  "viewType" : "custom-upload-latest-cc"
+}

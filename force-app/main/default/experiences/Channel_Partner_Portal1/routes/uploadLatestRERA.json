@@ -1,0 +1,12 @@
+{
+  "activeViewId" : "b7240280-9b6f-4013-b67c-4104bb9449fc",
+  "appPageId" : "5f3496ad-333d-4427-9210-776490b7cc27",
+  "configurationTags" : [ ],
+  "devName" : "uploadlatestrera__c",
+  "id" : "d7ee4a58-b152-4fb3-ad53-b42f93d43ccf",
+  "label" : "Upload Latest RERA",
+  "pageAccess" : "UseParent",
+  "routeType" : "custom-upload-latest-rera",
+  "type" : "route",
+  "urlPrefix" : "upload-latest-rera"
+}

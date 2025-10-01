@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Loyalty Lead Creation</label>
+    <protected>false</protected>
+    <values>
+        <field>Message_Content__c</field>
+        <value xsi:type="xsd:string">Dear Sir/Ma&apos;am,
+
+Thank you for showing interest in {{1}}. We cordially invite you for a personal preview of our project &amp; we eagerly anticipate the opportunity to welcome you as a cherished flat owner at our prestigious project.
+
+Warm regards, Team R Circle Runwal Group</value>
+    </values>
+    <values>
+        <field>RW_Type__c</field>
+        <value xsi:nil="true"/>
+    </values>
+    <values>
+        <field>RW_element_name__c</field>
+        <value xsi:type="xsd:string">loyalty_lead_creation</value>
+    </values>
+    <values>
+        <field>RW_namespace__c</field>
+        <value xsi:nil="true"/>
+    </values>
+</CustomMetadata>

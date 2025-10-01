@@ -1,0 +1,46 @@
+{
+  "appPageId" : "5f3496ad-333d-4427-9210-776490b7cc27",
+  "componentName" : "siteforce:sldsOneColLayout",
+  "dataProviders" : [ ],
+  "id" : "b7240280-9b6f-4013-b67c-4104bb9449fc",
+  "label" : "Upload Latest RERA",
+  "regions" : [ {
+    "id" : "2ac3e590-3a2d-43ab-b15e-52e04050b773",
+    "regionName" : "header",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : { },
+      "componentName" : "c:cpuploadRERAnCC",
+      "id" : "bf66a831-a492-4bc3-b3bc-6862848f7ba5",
+      "renderPriority" : "NEUTRAL",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "e95b8f88-dc39-4822-a987-d365b192f877",
+    "regionName" : "content",
+    "type" : "region"
+  }, {
+    "id" : "68382110-2a83-4e85-b8ca-047641af1c3f",
+    "regionName" : "footer",
+    "type" : "region"
+  }, {
+    "components" : [ {
+      "componentAttributes" : {
+        "customHeadTags" : "",
+        "description" : "",
+        "title" : "Upload Latest RERA"
+      },
+      "componentName" : "forceCommunity:seoAssistant",
+      "id" : "15fe1c76-093e-47c7-873f-99f171028154",
+      "renditionMap" : { },
+      "type" : "component"
+    } ],
+    "id" : "1418ee3d-14bc-4501-bbcc-c17c44bb3b44",
+    "regionName" : "sfdcHiddenRegion",
+    "type" : "region"
+  } ],
+  "themeLayoutType" : "Inner",
+  "type" : "view",
+  "viewType" : "custom-upload-latest-rera"
+}

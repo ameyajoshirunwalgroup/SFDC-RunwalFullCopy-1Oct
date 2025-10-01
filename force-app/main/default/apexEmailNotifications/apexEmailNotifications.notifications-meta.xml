@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ApexEmailNotifications xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apexEmailNotification>
+        <user>dolly.bindal@saasworx.ai</user>
+    </apexEmailNotification>
+    <apexEmailNotification>
+        <email>dolly.bindal@saasworx.ai</email>
+    </apexEmailNotification>
+    <apexEmailNotification>
+        <email>00D9I000001tHAvUAM+7b1f5c7d-5374-4adb-9516-a7c7ead48551@us.platform.gearset.com</email>
+    </apexEmailNotification>
+</ApexEmailNotifications>

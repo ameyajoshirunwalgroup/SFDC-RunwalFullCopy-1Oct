@@ -1,0 +1,12 @@
+{
+  "activeViewId" : "f9a330c1-0990-4934-aaa3-b2cc54104e8c",
+  "appPageId" : "5f3496ad-333d-4427-9210-776490b7cc27",
+  "configurationTags" : [ ],
+  "devName" : "uploadlatestcc__c",
+  "id" : "4ce31216-ff4c-42ce-975b-4eb490195140",
+  "label" : "Upload Latest CC",
+  "pageAccess" : "UseParent",
+  "routeType" : "custom-upload-latest-cc",
+  "type" : "route",
+  "urlPrefix" : "upload-latest-cc"
+}
