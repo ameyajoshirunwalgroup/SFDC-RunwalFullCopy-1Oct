@@ -294,5 +294,45 @@ update bb;*/
     }
     //Added by Prashant ../// 21-08-25 End
     
+    //Added by Prashant 06-10-2025. Start
+    public static void createTempCPTasks(list<Broker__c> tempcplist){
+        list<Task> tlist = new list<Task>();
+        Id cpRecordTypeId = Schema.SObjectType.Task.getRecordTypeInfosByName().get('Channel Partner').getRecordTypeId();
+        for(Broker__c bk : tempcplist){
+            Task t = new Task();
+            t.WhatId = bk.id;
+            t.OwnerId = bk.OwnerId;
+            Date todayDate = System.today();
+            DateTime createTime = DateTime.now();                
+            t.ActivityDate = system.today().addDays(15);                    
+            t.Status = 'In-progress';
+            String subject = 'Temporary CP Registration Pending – '+ bk.Name;
+            t.Subject = subject;
+            //t.Task_Type__c = '';
+            t.Type = 'Other';
+            t.Task_Type__c = 'CP Call';
+            t.RecordTypeId = cpRecordTypeId;
+            t.Priority = 'Normal';                    
+            String nbody1 = 'Kindly ensure that the registration is completed at the earliest to avoid delays in onboarding, payment, or portal access.\nRegards,';
+            t.Description = nbody1; 
+            t.ReminderDateTime = System.now();
+            t.IsReminderSet = true; 
+            tlist.add(t);
+        }
+        if(!tlist.isEmpty()){
+            Database.SaveResult[] wiList = Database.insert(tlist, false);
+
+            for(Database.SaveResult sr : wiList){
+                if(!sr.isSuccess()){
+                    for(Database.Error err : sr.getErrors()){
+                        System.debug(err.getStatusCode() + ':' + err.getMessage());
+                    }
+                }
+            }
+        }
+    }
+    //Added by Prashant 06-10-2025. End
+    
+    
     
 }

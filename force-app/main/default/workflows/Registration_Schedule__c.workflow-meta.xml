@@ -8,7 +8,7 @@
             <field>Customer_Email__c</field>
             <type>email</type>
         </recipients>
-        <senderAddress>customer.care@runwalgroup.in</senderAddress>
+        <senderAddress>crm7mahalaxmi@runwalgroup.in</senderAddress>
         <senderType>OrgWideEmailAddress</senderType>
         <template>My_View/Registration_Confirmation</template>
     </alerts>
@@ -20,7 +20,7 @@
             <field>Customer_Email__c</field>
             <type>email</type>
         </recipients>
-        <senderAddress>customer.care@runwalgroup.in</senderAddress>
+        <senderAddress>crm7mahalaxmi@runwalgroup.in</senderAddress>
         <senderType>OrgWideEmailAddress</senderType>
         <template>My_View/Registration_Schedule_Email</template>
     </alerts>

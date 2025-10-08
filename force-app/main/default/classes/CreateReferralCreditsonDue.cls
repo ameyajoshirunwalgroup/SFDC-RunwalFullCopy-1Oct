@@ -9,7 +9,7 @@ global class CreateReferralCreditsonDue implements Database.Batchable<sObject>,S
                                  TDS_5_to_be_deducted__c, X1_of_Agreement_Value__c, Referral__c, Source_of_Booking__c, Sub_Source__c, Registration_Status__c, Referral_Passback__c,
                                  X20_Received_Date__c, Customer_Reference_Opportunity__r.Booking__r.X20_Received_Date__c FROM Booking__c 
                                  WHERE Source_of_Booking__c = 'Referral' AND Sub_Source__c = 'Existing client reference' AND Registration_Status__c = 'Due' AND Referral_Passback__c != 0 AND 
-                                 Referral_Passback__c <=1 AND X20_Received_Date__c = TODAY AND Customer_Reference_Opportunity__r.Booking__r.X20_Received_Date__c != NULL];
+                                 Referral_Passback__c < 1 AND X20_Received_Date__c = TODAY AND Customer_Reference_Opportunity__r.Booking__r.X20_Received_Date__c != NULL];
 
         return bkgs;
     }

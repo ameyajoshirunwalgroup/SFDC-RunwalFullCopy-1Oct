@@ -3920,6 +3920,11 @@
             <field>Bank_Preference_3__c</field>
             <table>Opportunity.Booking__r.Welcome_Calls__r</table>
         </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>Reason_for_Hold_Reject__c</field>
+            <table>Opportunity.Booking__r.Welcome_Calls__r</table>
+        </columns>
         <masterLabel>Welcome Calls</masterLabel>
     </sections>
 </ReportType>

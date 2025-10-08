@@ -6,7 +6,7 @@ global without sharing class Lockated_CPGetMyLeads {
        RestRequest req = RestContext.request;
         RestResponse res = RestContext.response;
         res.addHeader('Content-Type', 'application/json');
-        String cpId = req.requestURI.substring(req.requestURI.lastIndexOf('/')+1);
+        String cpId = req.params.get('cpId');
         Map<String, Object> errorResult = new Map<String, Object>();
         if(String.isBlank(cpId)){
             errorResult.put('status', 'error');

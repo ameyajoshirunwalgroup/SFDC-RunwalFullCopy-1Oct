@@ -725,34 +725,6 @@ throw new AuraHandledException(e.getMessage());
         bk.Sourcing_Manager__c = UserInfo.getUserId();
         try{
             insert bk;
-            if(bk.Id != null){                
-                Id cpRecordTypeId = Schema.SObjectType.Task.getRecordTypeInfosByName().get('Channel Partner').getRecordTypeId();
-                Task t = new Task();
-                t.WhatId = bk.id;
-                t.OwnerId = UserInfo.getUserId();
-                Date todayDate = System.today();
-                DateTime createTime = DateTime.now();                
-                t.ActivityDate = system.today().addDays(15);                    
-                t.Status = 'In-progress';
-                String subject = 'Temporary CP Registration Pending – '+ bk.Name;
-                t.Subject = subject;
-                //t.Task_Type__c = '';
-                t.Type = 'Other';
-                t.Task_Type__c = 'CP Call';
-                t.RecordTypeId = cpRecordTypeId;
-                t.Priority = 'Normal';                    
-                String nbody1 = 'Kindly ensure that the registration is completed at the earliest to avoid delays in onboarding, payment, or portal access.\nRegards,';
-                t.Description = nbody1; 
-                t.ReminderDateTime = System.now();
-                t.IsReminderSet = true; 
-                try{
-                    insert t;
-                }catch(Exception e){
-                    throw new AuraHandledException(e.getMessage());
-                }
-                
-                return bk.id;                  
-            }
         } catch (Exception e) {
             String cleanMessage;            
             if (e instanceof DmlException) {

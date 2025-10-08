@@ -21,12 +21,13 @@ public class AdditionalBatchBrokeragebathc implements Database.Batchable<SObject
             'AND RW_X9_99_Received__c = true ' +
             'AND Source_of_Booking__c = \'Channel Partner\' ' +
             'AND createddate = THIS_MONTH '+
-            'ORDER BY Booking_Date__c ASC'
+            'ORDER BY Booking_Date__c DESC'
         );
     }
-
+  
     // Execute method: process records
     public void execute(Database.BatchableContext bc, List<Booking__c> scope) {
+          system.debug('Inside first bathc ----'+scope); 
         Set<Id> schemeIds = new Set<Id>();
         for (Booking__c b : scope) {
             if (b.Brokerage_Scheme__c != null) {
@@ -51,7 +52,6 @@ public class AdditionalBatchBrokeragebathc implements Database.Batchable<SObject
         }
     }
 
-    // Finish method: optional logging
     public void finish(Database.BatchableContext bc) {
         System.debug('Brokerage Scheme batch completed.');
     }

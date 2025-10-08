@@ -42,6 +42,13 @@
                     <stringValue>AOP Final Brokerage</stringValue>
                 </rightValue>
             </conditions>
+            <conditions>
+                <leftValueReference>$Record.Brokerage_Lookup__r.Brokerage_Type__c</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>AOP Brokerage</stringValue>
+                </rightValue>
+            </conditions>
             <connector>
                 <targetReference>Create_cp_brokarge</targetReference>
             </connector>

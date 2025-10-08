@@ -1778,7 +1778,15 @@
         <enabled>false</enabled>
     </classAccesses>
     <classAccesses>
+        <apexClass>Lockated_CPAddLead</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>Lockated_CPAnalytics</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>Lockated_CPAuth</apexClass>
         <enabled>false</enabled>
     </classAccesses>
     <classAccesses>
@@ -1790,6 +1798,22 @@
         <enabled>false</enabled>
     </classAccesses>
     <classAccesses>
+        <apexClass>Lockated_CPCreateCase</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>Lockated_CPCustomerAnalytics</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>Lockated_CPGetBrokerageDetails</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>Lockated_CPGetLadderProgress</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>Lockated_CPGetMyLeads</apexClass>
         <enabled>false</enabled>
     </classAccesses>
@@ -1798,7 +1822,7 @@
         <enabled>false</enabled>
     </classAccesses>
     <classAccesses>
-        <apexClass>Lockated_CPRegistration_RERA</apexClass>
+        <apexClass>Lockated_CPOfferMasterDetails</apexClass>
         <enabled>false</enabled>
     </classAccesses>
     <classAccesses>
@@ -1815,10 +1839,6 @@
     </classAccesses>
     <classAccesses>
         <apexClass>Lockated_FirebasePushService</apexClass>
-        <enabled>false</enabled>
-    </classAccesses>
-    <classAccesses>
-        <apexClass>Lockated_GetCPBrokerageDetails</apexClass>
         <enabled>false</enabled>
     </classAccesses>
     <classAccesses>
@@ -1990,6 +2010,10 @@
         <enabled>false</enabled>
     </classAccesses>
     <classAccesses>
+        <apexClass>OpportunityCustomerCreationTest</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>OpportunityScoringHandler</apexClass>
         <enabled>false</enabled>
     </classAccesses>
@@ -2091,6 +2115,14 @@
     </classAccesses>
     <classAccesses>
         <apexClass>PersonAccountManagementServices</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>PineLabs_EarnModule</apexClass>
+        <enabled>false</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>PineLabs_UserDetails</apexClass>
         <enabled>false</enabled>
     </classAccesses>
     <classAccesses>
@@ -4834,6 +4866,11 @@
         <editable>false</editable>
         <field>Account.Rating</field>
         <readable>false</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>Account.Referral_Points__c</field>
+        <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
@@ -8988,6 +9025,11 @@
     <fieldPermissions>
         <editable>false</editable>
         <field>Broker__c.days_from_creation__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>Brokerage_Invoice__c.AOP_Brokerage__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -20922,6 +20964,11 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
+        <field>Offer_Master__c.Image__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
         <field>Offer_Master__c.Monetizable__c</field>
         <readable>true</readable>
     </fieldPermissions>
@@ -30516,6 +30563,11 @@
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
+        <editable>true</editable>
+        <field>RW_Welcome_Call__c.Reason_for_Hold_Reject__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
         <editable>false</editable>
         <field>RW_Welcome_Call__c.Stamp_Duty_and_Registration_Total__c</field>
         <readable>true</readable>
@@ -39047,7 +39099,15 @@
         <layout>Entitlement-Entitlement Layout</layout>
     </layoutAssignments>
     <layoutAssignments>
+        <layout>Event-Channel Partner%2FCorporate Layout</layout>
+        <recordType>Event.Channel_Partner_Corporates_Event</recordType>
+    </layoutAssignments>
+    <layoutAssignments>
         <layout>Event-Event Layout</layout>
+    </layoutAssignments>
+    <layoutAssignments>
+        <layout>Event-Event Layout</layout>
+        <recordType>Event.Event</recordType>
     </layoutAssignments>
     <layoutAssignments>
         <layout>ExpressionSet-Expression Set Layout</layout>
@@ -41200,6 +41260,16 @@
         <default>false</default>
         <recordType>Company_Target__c.Signed_Vertical_Target</recordType>
         <visible>false</visible>
+    </recordTypeVisibilities>
+    <recordTypeVisibilities>
+        <default>false</default>
+        <recordType>Event.Channel_Partner_Corporates_Event</recordType>
+        <visible>true</visible>
+    </recordTypeVisibilities>
+    <recordTypeVisibilities>
+        <default>true</default>
+        <recordType>Event.Event</recordType>
+        <visible>true</visible>
     </recordTypeVisibilities>
     <recordTypeVisibilities>
         <default>false</default>

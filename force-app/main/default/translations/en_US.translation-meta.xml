@@ -385,6 +385,10 @@
         <name>Interakt_Secret_Key</name>
     </customLabels>
     <customLabels>
+        <label><!-- Interakt Secret Key RG --></label>
+        <name>Interakt_Secret_Key_RG</name>
+    </customLabels>
+    <customLabels>
         <label><!-- LeadSourceToSendWhatsApp --></label>
         <name>LeadSourceToSendWhatsApp</name>
     </customLabels>
@@ -2296,6 +2300,33 @@
             </choices>
             <screens>
                 <fields>
+                    <inputParameters>
+                        <name>fieldApiName</name>
+                        <value/>
+                    </inputParameters>
+                    <inputParameters>
+                        <name>label</name>
+                        <value/>
+                    </inputParameters>
+                    <inputParameters>
+                        <name>maxValues</name>
+                        <value/>
+                    </inputParameters>
+                    <inputParameters>
+                        <name>objectApiName</name>
+                        <value/>
+                    </inputParameters>
+                    <inputParameters>
+                        <name>recordId</name>
+                        <value/>
+                    </inputParameters>
+                    <inputParameters>
+                        <name>required</name>
+                        <value/>
+                    </inputParameters>
+                    <name>CRM_Manager</name>
+                </fields>
+                <fields>
                     <name>Create_Lead_Section1</name>
                 </fields>
                 <fields>
@@ -2345,6 +2376,16 @@
                         <value/>
                     </inputParameters>
                     <name>Create_Lead_Section3_Column2</name>
+                </fields>
+                <fields>
+                    <name>Create_Lead_Section4</name>
+                </fields>
+                <fields>
+                    <inputParameters>
+                        <name>width</name>
+                        <value/>
+                    </inputParameters>
+                    <name>Create_Lead_Section4_Column1</name>
                 </fields>
                 <fields>
                     <inputParameters>

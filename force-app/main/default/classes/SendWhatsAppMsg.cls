@@ -519,7 +519,7 @@ jsonParse += ',"' + param9 + '"';
         HttpRequest req = new HttpRequest(); 
         req.setMethod('POST');
         req.setHeader('Content-Type', 'application/json');
-        req.setHeader('Authorization', 'Basic ' + System.Label.Interakt_Secret_Key); 
+        req.setHeader('Authorization', 'Basic ' + System.Label.Interakt_Secret_Key_RG);  
         req.setEndpoint('https://api.interakt.ai/v1/public/message/');
         req.setBody(jsonParse);
         HTTPResponse res = http.send(req);

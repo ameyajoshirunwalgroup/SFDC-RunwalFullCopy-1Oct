@@ -136,6 +136,37 @@
         
         $A.enqueueAction(action); 
     },
+   loadReasonsForHoldRejectPicklist: function(component, event, helper) {
+    var action = component.get("c.getHoldRejectData");
+    action.setParams({
+        strBookingId: component.get("v.recordId")
+    });
+
+    action.setCallback(this, function(response) {
+        var state = response.getState();
+        if (state === "SUCCESS") {
+            var result = response.getReturnValue();
+            console.log('✅ Hold/Reject data:', result);
+
+            // Build picklist options
+            var picklistValues = result.picklistValues || [];
+            var options = [{ value: "", label: "--None--" }];
+            picklistValues.forEach(function(value) {
+                options.push({ value: value, label: value });
+            });
+
+            component.set("v.ReasonsForHoldRejectPicklistOptions", options);
+
+            // Prepopulate with stored reason if found
+            if (result.reason) {
+                component.set("v.ReasonsForHoldReject", result.reason);
+            }
+        } else {
+            console.error('⚠️ Error loading hold/reject data:', response.getError());
+        }
+    });
+    $A.enqueueAction(action);
+},
 
     loadCriticalListHelper : function(component, event) {
         
@@ -147,7 +178,7 @@
                               'Project', 'FlatTypology', 'Wing', 'Floor', 'FlatNo', 'CarpetArea', 'CarParkings',
                               'AgreementValue','SourceOfBooking','BankingPreferenceforLoan', 'PaymentPlanType',
                               'PaymentPlanMilestonesDetails','ViewCostSheet','ReceiptListRemarks',
-                              'Modeoffunding','RMName','RMcontactNumber','RMworkhours','RMemail', 'Remarks', 'PrimaryPANDetails',
+                              'ModeOfFunding','RMName','RMcontactNumber','RMworkhours','RMemail', 'Remarks', 'PrimaryPANDetails',
                              'Applicant2PAN', 'BookingDate','RegistrationConsultant','FamilyCount','ResidencePincode','Profession','OfficecDistance','CompanyName','Industry','Designation','FamilyIncome','PurchaseReason','VehiclesCount','FourWheeler'];
         component.set("v.inputValueList",inputValueList);
         
@@ -166,17 +197,17 @@
                         component.set("v.CriticalNonCriticalMetaList", CriticalNonCriticalMetaList);
                         for(var i=0; i<CriticalNonCriticalMetaList.length; i++ ){
                             if(CriticalNonCriticalMetaList[i].Type__c == "Critical"){
-                                //console.log('MasterLabel!!!',CriticalNonCriticalMetaList[i].MasterLabel);
+                                console.log('MasterLabel!!!',CriticalNonCriticalMetaList[i].MasterLabel);
                                 var CriticalMap = component.get("v.CriticalMap");
                                 var CriticalList = component.get("v.CriticalList");
                                 for(let j = 0; j < inputValueList.length; j++) { 
                                     if(CriticalNonCriticalMetaList[i].MasterLabel === inputValueList[j]){
-                                        // console.log('inputValueList!!!',inputValueList[j]);
+                                        console.log('inputValueList!!!',inputValueList[j]);
                                         
                                         CriticalMap[inputValueList[j]] = inputValueList[j];
                                         CriticalList.push(CriticalNonCriticalMetaList[i].MasterLabel);
                                         
-                                        //  console.log('CriticalMap!!! ' ,CriticalMap);
+                                          console.log('CriticalMap!!! ' ,CriticalMap);
                                     }
                                 }
                                 component.set("v.CriticalList", CriticalList);
@@ -269,6 +300,7 @@
             component.set("v.BankPreferenceforLoan3", null);
             component.set("v.BankPreferenceforLoan", []);
         }
+        
     },
 
     loadModeOfFundingHelper: function(component, event) {
@@ -456,10 +488,18 @@
         console.log('selectedCheckboxName___',selectedCheckboxName);
         var selectedCheckboxLabel = event.getSource().get("v.label");
         console.log('selectedCheckboxLabel___',selectedCheckboxLabel);
-       // if(selectedCheckboxName === 'Modeoffunding'){
-         // selectedCheckboxLabel = component.get("v.BankPreferenceforLoan");
-       // }
-                   
+          if(selectedCheckboxName === 'ModeOfFunding'){
+        // Get the current ModeOfFunding value
+        var modeOfFunding = component.get("v.selectedValue");
+        var bank1 = component.get("v.BankPreferenceforLoan1") || '';
+        
+        // If you need to store both values, you might want to create a combined string
+        selectedCheckboxLabel = modeOfFunding;
+        if (modeOfFunding === 'Bank Loan' && bank1) {
+            selectedCheckboxLabel += ' - ' + bank1;
+        }
+    }
+        
         var selectedCheckBoxes =  component.get("v.selectedCheckBoxes");
         var mapOfKeyValueGet =  component.get("v.mapOfKeyValue");
         var mapOfKeyValueNew =  component.get("v.mapOfKeyValueNew");
@@ -472,6 +512,8 @@
         
         console.log('___selectedCheckBoxes___'+selectedCheckBoxes);
 
+     
+        
         if(selectedCheckboxValue === ''){ 
           
             selectedCheckBoxes.splice(selectedCheckBoxes.indexOf(selectedCheckboxValue), 1);
@@ -575,7 +617,8 @@
             var bank1 = component.get("v.BankPreferenceforLoan1") || '';
             var bank2 = component.get("v.BankPreferenceforLoan2") || '';
             var bank3 = component.get("v.BankPreferenceforLoan3") || '';
-         
+         	var reasonsForHoldReject = component.get("v.ReasonsForHoldReject") || '';
+         	console.log('reasonsForHoldReject------->',reasonsForHoldReject);
          
 
     // Mode of Funding is required
@@ -608,36 +651,35 @@
             toastEvent.fire();
             return; 
         }
-        /*if(!bank2 || bank2 === ''){
-            var toastEvent = $A.get("e.force:showToast");
-            toastEvent.setParams({
-                title : 'Error',
-                message: 'Please select Bank Prefrence 2',
-                duration:'5000',
-                key: 'info_alt',
-                type: 'error',
-                mode: 'pester'
-            });
-            toastEvent.fire();
-            return; 
-        }
-        if(!bank3 || bank3 === ''){
-            var toastEvent = $A.get("e.force:showToast");
-            toastEvent.setParams({
-                title : 'Error',
-                message: 'Please select Bank Prefrence 3',
-                duration:'5000',
-                key: 'info_alt',
-                type: 'error',
-                mode: 'pester'
-            });
-            toastEvent.fire();
-            return; 
-        }*/
     }
-         
          var label = event.getSource().get("v.label");
          console.log('label___',label);
+          var reasonsForHoldReject = component.get("v.ReasonsForHoldReject");
+    
+        console.log('Button clicked: ', label);
+        console.log('Selected reason: ', reasonsForHoldReject);
+             // Validate Reasons field for Hold/Reject actions
+    if ((label === 'Hold' || label === 'Reject') && (!reasonsForHoldReject || reasonsForHoldReject === '')) {
+        component.set("v.showReasonsRow", true);
+        var toastEvent = $A.get("e.force:showToast");
+        toastEvent.setParams({
+            title : 'Error',
+            message: 'Please select a Reason for Hold/Reject before proceeding',
+            duration:'5000',
+            key: 'info_alt',
+            type: 'error',
+            mode: 'pester'
+        });
+        toastEvent.fire();
+        return; // Stop execution
+    }else if (label === 'Accept') {
+        // Clear the reasons field when Accept is clicked
+        component.set("v.ReasonsForHoldReject", '');
+        component.set("v.showReasonsRow", false);
+        // Proceed with Accept logic directly
+    }
+    
+         
          var mapOfKeyBoolean =  component.get("v.mapOfKeyBoolean");
          console.log('mapOfKeyBoolean___',mapOfKeyBoolean);
          var finalList = component.get("v.finalListOfValue");
@@ -650,6 +692,10 @@
          var count = 0;
          var yescheck = '';
          for (var key in mapOfKeyBoolean) { 
+             //Added By Dolly 
+              if (key === 'mySelect') {
+                    continue;
+                }
              count++;
              console.log('___key ','Key____ ',key,' ',mapOfKeyBoolean[key]);
              var str = mapOfKeyBoolean[key].split('~');
@@ -749,6 +795,7 @@
                  "bankPrefrence2": bank2,
                  "bankPrefrence3": bank3,
                  "BankPreferenceforLoan": BankPrefLoan,
+                 "reasonsForHoldReject":reasonsForHoldReject,
                  "receiptList": receiptList,
                  "isDhamaka": component.get("v.isDhamaka")
              });

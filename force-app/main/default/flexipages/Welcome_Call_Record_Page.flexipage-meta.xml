@@ -131,6 +131,12 @@
                 <identifier>RecordDhamaka_Offer_to_be_Sent_cField</identifier>
             </fieldInstance>
         </itemInstances>
+        <itemInstances>
+            <fieldInstance>
+                <fieldItem>Record.Reason_for_Hold_Reject__c</fieldItem>
+                <identifier>RecordReason_for_Hold_Reject__cField</identifier>
+            </fieldInstance>
+        </itemInstances>
         <name>Facet-5a3f9598-ff3b-4637-962f-937396250d78</name>
         <type>Facet</type>
     </flexiPageRegions>

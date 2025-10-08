@@ -323,6 +323,13 @@
         <notificationType>personal_org_creation</notificationType>
     </notificationTypeSettings>
     <notificationTypeSettings>
+        <notificationChannels>
+            <desktopEnabled>true</desktopEnabled>
+            <mobileEnabled>false</mobileEnabled>
+        </notificationChannels>
+        <notificationType>personal_org_transfer</notificationType>
+    </notificationTypeSettings>
+    <notificationTypeSettings>
         <appSettings>
             <connectedAppName>sf_chttr_apps__Chatter_for_Android</connectedAppName>
             <enabled>true</enabled>

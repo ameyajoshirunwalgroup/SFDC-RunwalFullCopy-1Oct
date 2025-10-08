@@ -9,8 +9,8 @@ public with sharing class OpportunityCustomerCreation {
                   RW_Sourcing_Head__c,Walkin_Source__c,Account.Salutation,Account.FirstName,Account.LastName,
                   Account.Middle_Name__c,Account.Gender__c,Account.Marital_Status__c,Account.RW_Occupation__c,
                   Account.RW_Designation__c,Account.Organization_Name__c,Account.Mobile_No__c,Account.PersonEmail,
-                  Account.RW_Additional_Email__c,Account.PersonTitle,Account.PersonMailingCity,Account.PersonMailingCountry,
-                  Account.PersonMailingPostalCode,Account.PersonMailingState,Account.PersonMailingStreet
+                  Account.RW_Additional_Email__c,Account.PersonTitle,Account.BillingCity,Account.BillingCountry,
+                  Account.BillingPostalCode,Account.BillingState,Account.BillingStreet
                   from Opportunity where Id in: oIdSet];
         List<ERP_Integration_Log__c> erpLogs = [SELECT Id, API_Name__c, Status__c, Opportunity__c FROM ERP_Integration_Log__c WHERE Opportunity__c =: oList[0].Id  and Status__c = 'Success' and API_Name__c = 'Opportunity Customer Creation/Update'];
        
@@ -54,43 +54,52 @@ public with sharing class OpportunityCustomerCreation {
         if(oppId != null) {
             // project data check
             pRec = [Select Id, Name,SAPMaterial_Code__c, Sales_District__c, Project_Property_Type__c,allotment_charges_1__c, allotment_charges_2__c,allotment_charges_3__c,allotment_charges_4__c,allotment_charges_5__c,allotment_charges_6__c from Project__c where Id = : oList[0].RW_Project__c];
-            if(pRec == null || pRec.size() > 1) {
-                errMsg += 'Project Data Issue,';
+            if(pRec == null || pRec.size() == 0) {
+                errMsg += 'Project Data Issue';
                 dataError = true;
             } else {
                 if(pRec[0].SAPMaterial_Code__c == null) {
-                    errMsg += 'SAP Project Code not present,';
+                    errMsg += 'SAP Project Code not present';
                     dataError = true;
                 }
             }
             // tower or plant data check
             tRec = [Select Id, Name, Property_Type__c,SAP_Plant_Code__c  from Tower__c where Id = : oList[0].RW_Project_Unit__r.TowerName__c];
-            if(tRec == null || tRec.size() > 1) {
-                errMsg += 'Tower Data Issue,';
+            if(tRec == null || tRec.size() == 0) {
+                errMsg += 'Tower Data Issue';
                 dataError = true;
                 
             } else {
                 if(tRec[0].SAP_Plant_Code__c == null) {
-                    errMsg += 'SAP Tower Code not present,';
+                    errMsg += 'SAP Tower Code not present';
                     dataError = true;
                 }
             }   
             
             if(oList[0].RW_Project_Unit__c == null) {
                 dataError = true;
-                errMsg = 'Unit not present,';
+                errMsg = 'Unit not present';
             } else {
                 unitId = oList[0].RW_Project_Unit__c;
                 uList = [Select Id, Name,Unit_SAP_Code__c,Saleable_Area__c, Carpet_area__c from Project_Unit__c where Id = : oList[0].RW_Project_Unit__c];
-                if(uList[0].Unit_SAP_Code__c == null) {
+                if(uList== null || uList.size()==0) {
                     dataError = true;
-                    errMsg += 'SAP Material Code not present in the unit,';
+                    errMsg += 'Unit Data Isuue';
+                }
+                else{
+                    if(uList[0].Unit_SAP_Code__c == null) {
+                        dataError = true;
+                        errMsg += 'SAP Material Code not present in the unit';
+                    }
                 }
             } 
             
             if(oList!=null && oList.size()>0){
-              //accList= [Select Id,Salutation,FirstName,LastName,Middle_Name__c,Gender__c,Marital_Status__c,RW_Occupation__c,RW_Designation__c,Organization_Name__c,Mobile_No__c,PersonEmail,RW_Additional_Email__c,PersonTitle,PersonMailingCity,PersonMailingCountry,PersonMailingPostalCode,PersonMailingState,PersonMailingStreet from Account where Id =: oList[0].AccountId];
               blockUnitList = [Select Id,Pan_Number__c,Aadhar_Number__c from Blocking_Unit_Information__c where Active__c = true AND Opportunity__c	=:oList[0].Id];
+            }
+            if(blockUnitList==null || blockUnitList.size()==0){
+                dataError = true;
+                errMsg += 'Block Unit Information not present';
             }
             if(oList.size()<0){
                dataError=true;
@@ -147,8 +156,6 @@ public with sharing class OpportunityCustomerCreation {
             }
             
             customerHeader.Marst = oList[0].Account.Marital_Status__c;
-            // customerHeader.Natio = 'India';// What to be sent in Natio
-            // customerHeader.Birthdt ='19880224'; // what should be sent in DOB no field on account
             customerHeader.Jobgr = oList[0].Account.RW_Occupation__c;
             customerHeader.StaffGrp =oList[0].Account.RW_Designation__c;
             
@@ -199,22 +206,21 @@ public with sharing class OpportunityCustomerCreation {
                 taxLineitem2.Taxtype = 'IN5';
                 taxLineitem2.Taxnumxl = blockUnitList[0].Aadhar_Number__c;
                 customerTaxList.item.add(taxLineItem2);
-            }
-                       
+            }                       
             
             // Mailing, Permanent and Office address of primary applicant
             CustomerCreation.TableOfZsdSfdcCustomerAddress customerAddressList = new CustomerCreation.TableOfZsdSfdcCustomerAddress();
             customerAddressList.item = new List<CustomerCreation.ZsdSfdcCustomerAddress>();
             
-            CustomerCreation.ZsdSfdcCustomerAddress mailingAddressItem = new CustomerCreation.ZsdSfdcCustomerAddress();
-            mailingAddressItem.Addrcode = '01';
-            mailingAddressItem.Street = oList[0].Account.PersonMailingStreet;
-            mailingAddressItem.PostCode = oList[0].Account.PersonMailingPostalCode;
-            mailingAddressItem.City = oList[0].Account.PersonMailingCity;
-            mailingAddressItem.Country = oList[0].Account.PersonMailingCountry;
+            CustomerCreation.ZsdSfdcCustomerAddress AddressItem = new CustomerCreation.ZsdSfdcCustomerAddress();
+            AddressItem.Addrcode = '01';
+            AddressItem.Street = oList[0].Account.BillingStreet;
+            AddressItem.PostCode = oList[0].Account.BillingPostalCode;
+            AddressItem.City = oList[0].Account.BillingCity;
+            AddressItem.Country = oList[0].Account.BillingCountry;
 
-            mailingAddressItem.Region  = oList[0].Account.PersonMailingState;
-            customerAddressList.item.add(mailingAddressItem);
+            AddressItem.Region  = oList[0].Account.BillingState;
+            customerAddressList.item.add(AddressItem);
 
             Integer SeqNo = 10;
             Integer count = 1;

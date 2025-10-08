@@ -100,6 +100,10 @@
         <name>Home_Loan_Taken_From_is_required</name>
     </validationRules>
     <validationRules>
+        <errorMessage><!-- From the First Disbursement Details Section: Please fill in all First Disbursement details (Date, Amount, Status, Sub-Status, Received, Remarks) before updating the status. --></errorMessage>
+        <name>Loan_Disbursement_Required_Fields</name>
+    </validationRules>
+    <validationRules>
         <errorMessage><!-- Either of Sanction Date, Sanction Status, Loan Account Number OR Sanction Amount is blank. --></errorMessage>
         <name>Loan_sacntion_check_point</name>
     </validationRules>
@@ -114,6 +118,10 @@
     <validationRules>
         <errorMessage><!-- Please enter NOC Handover Date --></errorMessage>
         <name>NOC_Handover_is_mandatory</name>
+    </validationRules>
+    <validationRules>
+        <errorMessage><!-- From the Sanction Details Section: Please fill in Sanction Amount, Sanction Date, and Sanction Status before marking the loan as Sanctioned. --></errorMessage>
+        <name>Require_Sanction_Details_When_Loan_Sanct</name>
     </validationRules>
     <validationRules>
         <errorMessage><!-- Please Upload the Sanction Letter First before making a Loan Sanctioned! --></errorMessage>

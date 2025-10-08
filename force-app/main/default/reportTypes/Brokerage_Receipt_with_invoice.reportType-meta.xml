@@ -470,6 +470,11 @@
             <field>CP_Brokerage__c</field>
             <table>Brokerage_Invoice__c</table>
         </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>AOP_Brokerage__c</field>
+            <table>Brokerage_Invoice__c</table>
+        </columns>
         <masterLabel>Brokerage Invoices</masterLabel>
     </sections>
 </ReportType>

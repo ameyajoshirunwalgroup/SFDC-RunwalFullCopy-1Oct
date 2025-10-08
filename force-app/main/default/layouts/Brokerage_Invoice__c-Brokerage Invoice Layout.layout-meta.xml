@@ -35,6 +35,10 @@
                 <behavior>Edit</behavior>
                 <field>CP_Brokerage__c</field>
             </layoutItems>
+            <layoutItems>
+                <behavior>Readonly</behavior>
+                <field>AOP_Brokerage__c</field>
+            </layoutItems>
         </layoutColumns>
         <layoutColumns>
             <layoutItems>

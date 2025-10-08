@@ -3,7 +3,7 @@ global without sharing class Lockated_CPAnalytics {
     @HttpGet
     global static ResponseWrapper doGet(){
         RestRequest req = RestContext.request;
-        String cpId = req.requestURI.substring(req.requestURI.lastIndexOf('/')+1);   
+        String cpId = req.params.get('cpId'); 
         if(String.isBlank(cpId))
         	return null;        
         Id CPRecordTypeId = Schema.SObjectType.Broker__c.getRecordTypeInfosByName().get('Channel Partner').getRecordTypeId();
@@ -36,7 +36,6 @@ global without sharing class Lockated_CPAnalytics {
                 FROM Opportunity where
                 RW_Walkin_Channel_Partner__c  = : cpId 
                 AND Walkin_Source__c  = 'Channel Partner'
-                AND StageName = 'Unit Booked'
             ];
         } else if(brs[0].RecordTypeId == TempCPRecordTypeId){
             activeOppsCount = [

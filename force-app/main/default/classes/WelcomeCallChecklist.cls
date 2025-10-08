@@ -210,7 +210,53 @@ public without sharing class WelcomeCallChecklist {
         return mapModeFunding;
     }
       
+@AuraEnabled
+public static Map<String, Object> getHoldRejectData(String strBookingId) {
+    Map<String, Object> resultMap = new Map<String, Object>();
     
+    try {
+        // 1️⃣ Fetch picklist values dynamically
+        Schema.DescribeFieldResult fieldResult = RW_Welcome_Call__c.Reason_for_Hold_Reject__c.getDescribe();
+        List<String> picklistValues = new List<String>();
+        for (Schema.PicklistEntry entry : fieldResult.getPicklistValues()) {
+            picklistValues.add(entry.getLabel());
+        }
+        resultMap.put('picklistValues', picklistValues);
+        
+        // 2️⃣ Fetch stored reason
+        List<RW_Welcome_Call__c> welcomeCalls = [
+            SELECT Reason_for_Hold_Reject__c
+            FROM RW_Welcome_Call__c
+            WHERE RW_Booking__c = :strBookingId
+            ORDER BY CreatedDate DESC 
+            LIMIT 1
+        ];
+        
+        if (!welcomeCalls.isEmpty()) {
+            resultMap.put('reason', welcomeCalls[0].Reason_for_Hold_Reject__c);
+        }
+    } catch (Exception e) {
+        System.debug('⚠️ Error: ' + e.getMessage());
+    }
+    
+    return resultMap;
+}
+
+    
+    @AuraEnabled
+public static List<String> getReasonsForHoldRejectPicklist() {
+    List<String> picklistValues = new List<String>();
+    
+    Schema.DescribeFieldResult fieldResult = RW_Welcome_Call__c.Reason_for_Hold_Reject__c.getDescribe();
+    List<Schema.PicklistEntry> ple = fieldResult.getPicklistValues();
+    
+    for(Schema.PicklistEntry pickListVal : ple) {
+        picklistValues.add(pickListVal.getLabel());
+    }
+    
+    return picklistValues;
+}
+
     //This Method is to show Booking/Applicant details in WC checklist
     @AuraEnabled
     public static WrpClsWelcomeObj callCheckList(string strBookingId){
@@ -253,6 +299,7 @@ public without sharing class WelcomeCallChecklist {
         @AuraEnabled
      public static RW_Welcome_Call__c saveCheckList(List<string> finalRemarksList,WrpClsWelcomeObj wrapperListToSave, String Status,
                                                     String addRrmks, String modeOfFunding, String bankPrefrence1, String bankPrefrence2, String bankPrefrence3, List<string>  BankPreferenceforLoan, 
+                                                    String reasonsForHoldReject,
                                                     List<Receipt__c> receiptList,Boolean isDhamaka){
                                                         
           
@@ -353,7 +400,7 @@ public without sharing class WelcomeCallChecklist {
             Wc.RW_Welcome_Call_Initiation_date__c   = System.today();
             Wc.RW_Booking__c                        = wrapperListToSave.bkg.Id;
             Wc.Booking_Id__c                        = wrapperListToSave.bkg.Id;
-                                                        
+            Wc.Reason_for_Hold_Reject__c = (Status == 'Accept') ? '' : reasonsForHoldReject;                                     
          
             if(Status == 'Accept'){ 
                 Wc.RW_Welcome_Call_Accepted_date__c = System.today();

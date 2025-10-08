@@ -144,14 +144,19 @@
     </relatedLists>
     <relatedLists>
         <fields>NAME</fields>
+        <fields>Slab_Name__c</fields>
+        <fields>Upper_Limit__c</fields>
+        <fields>Brokerage_Rate__c</fields>
         <relatedList>AOP_Slab__c.AOP__c</relatedList>
     </relatedLists>
     <relatedLists>
         <fields>NAME</fields>
+        <fields>Booking_Name__c</fields>
         <relatedList>Brokerage_Summary__c.AOP__c</relatedList>
     </relatedLists>
     <relatedLists>
         <fields>NAME</fields>
+        <fields>Brokerage_Type__c</fields>
         <relatedList>CP_Brokerage__c.AOP__c</relatedList>
     </relatedLists>
     <showEmailCheckbox>false</showEmailCheckbox>

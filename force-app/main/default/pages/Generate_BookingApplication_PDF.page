@@ -470,8 +470,12 @@
                 <table border="0" cellspacing="0" cellpadding="4" 
                        style="width: 100%; font-family:Arial MT; border-collapse:collapse; border: 1px solid #000;">
                     <tr>
-                        <td colspan="3" style="font-size:14px; border: none; text-align: left; width: 50%;">
+                        <!--td colspan="3" style="font-size:14px; border: none; text-align: left; width: 50%;">
                             <b>Details of Source:</b>&nbsp; {!bookingWrap.sourceOfBooking}
+                        </td-->
+                        <td colspan="3" style="font-size:14px; border: none; text-align: left; width: 50%;">
+                            <b>Details of Source:</b>&nbsp; 
+                            <apex:outputText value="{!IF(bookingWrap.sourceOfBooking == 'Channel Partner', 'CP', bookingWrap.sourceOfBooking)}"/>
                         </td>
                         <td style="font-size:14px; border: none; text-align: left; margin-left: 20px; width: 50%;">
                             <b>Type Of Client:</b>&nbsp; {!bookingWrap.TypeofClient}
@@ -488,7 +492,8 @@
                         <table border="1" cellspacing="0" cellpadding="4" 
                                style="width: 700px; font-family:Arial; border-collapse:collapse; border: 1px solid #000; width: 100%; table-layout: fixed;">
                             <tr>
-                                <td style="font-size:14px; border:1px solid #000;">Name of {!bookingWrap.sourceOfBooking}</td>
+                                <!--td style="font-size:14px; border:1px solid #000;">Name of {!bookingWrap.sourceOfBooking}</td-->
+                                 <td style="font-size:14px; border:1px solid #000;">Source Name</td>
                                 <td style="font-size:14px; border:1px solid #000; text-align:center;">
                                     <apex:outputText value="{!bookingWrap.nameOfCorporate}"/>
                                 </td>

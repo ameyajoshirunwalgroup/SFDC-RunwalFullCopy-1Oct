@@ -4675,6 +4675,11 @@
             <field>Lockated_User_FCM_ID_Action__c</field>
             <table>User.Accounts1__r</table>
         </columns>
+        <columns>
+            <checkedByDefault>false</checkedByDefault>
+            <field>Referral_Points__c</field>
+            <table>User.Accounts1__r</table>
+        </columns>
         <masterLabel>Accounts</masterLabel>
     </sections>
     <sections>

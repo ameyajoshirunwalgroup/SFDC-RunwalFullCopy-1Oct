@@ -298,7 +298,8 @@ global class GetCurrentLoggedInAgents {
                         if(ld.Integration_Source__c == 'Website' && ld.RW_Project__c != null && autoCallbackUsersMap.containsKey(ld.RW_Project__r.Name)){
                             Scheduled_Call__c sc = new Scheduled_Call__c();
                             sc.Related_Record_Id__c = ld.Id;
-                            sc.Schedule_Date__c = Datetime.now().addSeconds(10);
+                            //sc.Schedule_Date__c = Datetime.now().addSeconds(10);
+                            sc.Schedule_Date__c = Datetime.now().addMinutes(2);
                             sc.Agent_Id__c = presalesUsers.get(ld.OwnerId).CTI_Agent_ID__c;
                             sc.Lead__c = ld.Id;
                             sc.Related_To__c = 'Lead';

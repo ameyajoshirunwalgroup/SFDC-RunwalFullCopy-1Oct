@@ -6,9 +6,10 @@ public class CP_InvoicePreview {
     public List<Brokerage_Scheme__c> brokerageScheme {get;set;}
     public List<Kicker_Incentive__c> KickerScheme {get;set;}
     public List<Place_of_Supply__c> pos {get;set;}
+    public List<AOP__c> aopDetails {get;set;}
     public String dateStr {get;set;}
     public Decimal TotalBrokerage {get;set;}
-    public Decimal Cgst {get;set;}
+    public Decimal Cgst {get;set;} 
     public Decimal Sgst {get;set;}
     public Decimal Igst {get;set;}
     public Decimal TotalwithTax {get;set;}
@@ -53,8 +54,9 @@ public class CP_InvoicePreview {
         public Decimal sgstAmount {get;set;}
         public Decimal igstAmount {get;set;}
         public Decimal totalWithTax {get;set;}
+        public Decimal brokeragePercentage {get;set;}
         
-        public InvoiceWrapper(Brokerage_Invoice__c inv, Boolean showGST, Boolean isTaxApplicable) {
+        public InvoiceWrapper(Brokerage_Invoice__c inv, Boolean showGST, Boolean isTaxApplicable, CP_Brokerage__c cpBrokerage, List<AOP__c> aopDetails) {
             this.invoice = inv;
             this.brokerageAmount = inv.Brokerage_In_Rs__c != null ? inv.Brokerage_In_Rs__c : 0;
             this.brokerageAmtStr = INFormat(this.brokerageAmount);
@@ -92,6 +94,7 @@ public class CP_InvoicePreview {
         legalentity = new List<Legal_Entity__c>();
         tlist = new List<Tower__c>();
         invoiceWrappers = new List<InvoiceWrapper>();
+        aopDetails = new List<AOP__c>();
         
         // Initialize boolean flags
         Base = false;
@@ -140,7 +143,7 @@ public class CP_InvoicePreview {
             System.debug('fetchInvoices - Starting with ID: ' + cpBrokerageId);
 
              cpBrokerage = [
-            SELECT Id, If_GST_is_applicable__c, Invoice_Number__c, Channel_Partner__c,Invoice_Date__c,Place_of_Supply__c,
+            SELECT Id, If_GST_is_applicable__c, Invoice_Number__c, Channel_Partner__c,Invoice_Date__c,Place_of_Supply__c,AOP__c,Brokerage_Type__c,
                     Channel_Partner__r.State__c,CGST__c, SGST__c, IGST__c
                        
             FROM CP_Brokerage__c
@@ -166,7 +169,21 @@ public class CP_InvoicePreview {
             System.debug('fetchInvoices - Validation errors on CP_Brokerage__c: ' + errormsg);
             return;
         }
-            
+             if(cpBrokerage.Brokerage_Type__c == 'AOP Brokerage' && cpBrokerage.AOP__c != null) {
+                try {
+                    aopDetails = [
+                        SELECT Id, Name, AOP_CP_Name__c, AOP_Non_AOP_Signed__c, Brokerage__c, 
+                               Brokerage_for_NRI__c, Brokerage_for_Outstation__c, Projects__c, 
+                               Relevant_zone__c, Start_Date__c,End_Date__c
+                        FROM AOP__c
+                        WHERE Id = :cpBrokerage.AOP__c
+                        LIMIT 1
+                    ];
+                    System.debug('fetchInvoices - Found ' + aopDetails.size() + ' AOP records');
+                } catch (Exception e) {
+                    System.debug('fetchInvoices - Error fetching AOP details: ' + e.getMessage());
+                }
+            }
             // Fetch all invoices for the CP Brokerage
             CPInv = [SELECT Id, Name, Approval_Status__c, Brokerage__c, Brokerage_In_Rs__c, Brokerage_Summary__c,
                        Channel_Partner__c, If_GST_is_applicable__c, Invoice_Number__c, Invoice_Status__c,
@@ -187,7 +204,8 @@ public class CP_InvoicePreview {
                        Booking__r.Customer_Name__c,
                        Booking__r.Booking_Date__c,
                        Booking__r.Unit_Number__c,
-                       Booking__r.Agreement_Value_for_brokers__c
+                       Booking__r.Agreement_Value_for_brokers__c,
+                       AOP_Brokerage__c
                 FROM Brokerage_Invoice__c
                 WHERE CP_Brokerage__c = :cpBrokerageId
                 ORDER BY CreatedDate ASC
@@ -257,7 +275,7 @@ public class CP_InvoicePreview {
             grandTotal = 0;
 
             for(Brokerage_Invoice__c inv : CPInv) {
-                InvoiceWrapper wrapper = new InvoiceWrapper(inv, showgst, istaxapplicable);
+                InvoiceWrapper wrapper = new InvoiceWrapper(inv, showgst, istaxapplicable,cpBrokerage,aopDetails);
                 invoiceWrappers.add(wrapper);
                 
                 totalBrokerageAmount += wrapper.brokerageAmount;

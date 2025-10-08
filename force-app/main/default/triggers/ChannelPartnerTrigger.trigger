@@ -108,6 +108,7 @@ br.Name = br.NAME_FIRST__c + ' ' + br.NAME_LAST__c;
         Map<Id,String> tempCPIdVsEmailMap = new Map<Id,String>();//Added by Prashant 25-08-25...///    
         List<String> cpIds = new List<String>(); //Added by coServe 14-02-2024
         List<String> cpIdsCPC = new List<String>();
+        list<Broker__c> tempCPList = new list<Broker__c>();//Added by Prashant 6-10-25.////
         for(Broker__c br : Trigger.New){
             if(br.RecordTypeId == ChannelPartnerId && br.Channel_Partner_From_CP_Portal__c == false && trigger.isInsert){//Added by Prashant to create account for only CP record type. //// 05-08-2025.
                 Account ac = new Account();
@@ -126,6 +127,7 @@ br.Name = br.NAME_FIRST__c + ' ' + br.NAME_LAST__c;
             if(br.RecordTypeId == tempRecordTypeId){
                 system.debug('Inside Temp CP');
                 tempCPIdVsEmailMap.put(br.Id,br.RW_Email__c);
+                tempCPList.add(br);
             }
             //Added by Prashant to send temp cp creation mail... 25-08-25///END
         }
@@ -139,6 +141,11 @@ br.Name = br.NAME_FIRST__c + ' ' + br.NAME_LAST__c;
             ChannelPartnerTriggerHandler.createCPCategory(cpIdsCPC);
         }
         //Added by Prashant 11-06-2025. End*
+        //Added by Prashant 06-10-2025. Start
+         if(tempCPList.size() > 0){ 
+            ChannelPartnerTriggerHandler.createTempCPTasks(tempCPList);
+        }
+        //Added by Prashant 06-10-2025. End
         //Added by Prashant 25-08-2025. Start
         if(tempCPIdVsEmailMap.size() > 0){
             system.debug('Inside tempCPIdVsEmailMap'+tempCPIdVsEmailMap);
