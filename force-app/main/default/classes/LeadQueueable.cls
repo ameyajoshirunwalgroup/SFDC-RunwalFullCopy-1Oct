@@ -48,7 +48,7 @@ public class LeadQueueable implements Queueable, Database.AllowsCallouts {
             return;
         }
         
-        templateName = objMeta.RW_element_name__c;
+        //templateName = objMeta.RW_element_name__c; //Commented by Vinay 13-10-2025
         
         // Query leads
         List<Lead> lstLeads = [SELECT Id, Name, RW_Mobile_No__c, RW_Project__r.Name, RW_Project__r.RW_LocalityName__c, Owners_Team__c,LeadSource
@@ -57,6 +57,14 @@ public class LeadQueueable implements Queueable, Database.AllowsCallouts {
         system.debug('lstLeads>>>>>' +lstLeads);
         Http http = new Http();
         for (Lead objLead : lstLeads) {
+            String secretKey; //Added by Vinay 13-10-2025
+            if(objLead.LeadSource == 'Referral'){ //Added by Vinay 13-10-2025
+                secretKey = System.Label.Interakt_Secret_Key;
+                templateName = 'new_lead_welcome_';
+            }else{
+                secretKey = System.Label.Interakt_Secret_Key_RG;
+                templateName = 'lead_welcome_message';
+            }
             
             if (String.isBlank(objLead.RW_Mobile_No__c)) {
                 System.debug('Skipping lead ' + objLead.Id + ' due to missing mobile number.');
@@ -93,7 +101,8 @@ public class LeadQueueable implements Queueable, Database.AllowsCallouts {
             HttpRequest req = new HttpRequest();
             req.setMethod('POST');
             req.setHeader('Content-Type', 'application/json');
-            req.setHeader('Authorization', 'Basic ' + System.Label.Interakt_Secret_Key);
+            //req.setHeader('Authorization', 'Basic ' + System.Label.Interakt_Secret_Key); //Commented by Vinay 13-10-2025
+            req.setHeader('Authorization', 'Basic ' + secretKey); //Added by Vinay 13-10-2025
             req.setEndpoint('https://api.interakt.ai/v1/public/message/');
             req.setBody(jsonParse);
             
