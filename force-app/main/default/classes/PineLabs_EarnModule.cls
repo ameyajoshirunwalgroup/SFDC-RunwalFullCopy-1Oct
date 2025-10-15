@@ -1,17 +1,34 @@
 @RestResource(urlMapping='/earnModule/*')
 global class PineLabs_EarnModule {
     
-    @HttpGet
+    /*@HttpGet
     global static void doGet(){
         RestRequest req = RestContext.request;
         RestResponse res = RestContext.response;
         res.addHeader('Content-Type', 'application/json');
         Map<String, Object> errorResult = new Map<String, Object>();
         List<String> freshRefLeads = new List<String>();
+        Date fromDate;
+        Date toDate;
+        if(req != null && req.requestBody != null){
+            system.debug('req: ' + req.requestBody);
+            String jsonBody = req.requestBody.toString();
+            system.debug('jsonBody: ' + jsonBody);
+            
+            if(String.isNotBlank(jsonBody)){
+                DateRange resData = (DateRange)JSON.deserialize(jsonBody, DateRange.class);
+                
+                if(resData != null){
+                    fromDate = (resData.fromDate != '')? Date.valueOf(resData.fromDate) : null;
+                    toDate = (resData.toDate != '')? Date.valueOf(resData.toDate) : null;
+                }
+            }
+        }
         try{
             
             Set<String> referredCustomers = new Set<String>();
-            Map<Id, Lead> referralLeadsToday = new Map<Id, Lead>([SELECT Id, Customer_Reference__c FROM Lead WHERE LeadSource = 'Referral' AND IsConverted = false AND CreatedDate = TODAY]);
+            //Map<Id, Lead> referralLeadsToday = new Map<Id, Lead>([SELECT Id, Customer_Reference__c FROM Lead WHERE LeadSource = 'Referral' AND Customer_Reference__c != null AND CreatedDate = TODAY]);
+            Map<Id, Lead> referralLeadsToday = new Map<Id, Lead>([SELECT Id, Customer_Reference__c FROM Lead WHERE LeadSource = 'Referral' AND Customer_Reference__c != null AND CreatedDate >=: fromDate AND CreatedDate <: toDate LIMIT 100]);
             System.debug('referralLeadsToday: ' + referralLeadsToday);
             Map<String, String> custIdVsLeadId = new Map<String, String>();
             for(Lead ld : referralLeadsToday.values()){
@@ -20,7 +37,8 @@ global class PineLabs_EarnModule {
             }
             System.debug('referredCustomers: ' + referredCustomers);
             List<RefDetails> siteVisits = new List<RefDetails>();
-            List<Opportunity> referralOppsToday = [SELECT Id, Customer_Reference__c, AccountId, Account.Mobile_No__c, Account.Name, Account.Booked_Opportunities__c FROM Opportunity WHERE CreatedDate = TODAY AND StageName = 'Site Visit' AND Customer_Reference__c != null AND LeadSource = 'Referral'];
+            //List<Opportunity> referralOppsToday = [SELECT Id, Customer_Reference__c, AccountId, Account.Mobile_No__c, Account.Name, Account.Booked_Opportunities__c,Customer_Reference__r.Name,Customer_Reference__r.Mobile_No__c,Customer_Reference__r.Booked_Opportunities__c FROM Opportunity WHERE CreatedDate = TODAY AND StageName = 'Site Visit' AND Customer_Reference__c != null AND LeadSource = 'Referral'];
+            List<Opportunity> referralOppsToday = [SELECT Id, Customer_Reference__c, AccountId, Account.Mobile_No__c, Account.Name, Account.Booked_Opportunities__c,Customer_Reference__r.Name,Customer_Reference__r.Mobile_No__c,Customer_Reference__r.Booked_Opportunities__c FROM Opportunity WHERE StageName = 'Site Visit' AND Customer_Reference__c != null AND LeadSource = 'Referral' AND CreatedDate >=: fromDate AND CreatedDate <: toDate];
             System.debug('referralOppsToday: ' + referralOppsToday);
             Map<String, Integer> refSiteVisits = new Map<String, Integer>();
             Map<String, String> custIdVsOppId = new Map<String, String>();
@@ -33,10 +51,10 @@ global class PineLabs_EarnModule {
                 }
                 custIdVsOppId.put(opp.Customer_Reference__c, opp.AccountId);
                 RefDetails ref = new RefDetails();
-                ref.customerId = opp.Account.Mobile_No__c;
-                ref.referredPerson = opp.Account.Name;
+                ref.customerId = opp.Customer_Reference__r.Mobile_No__c;
+                ref.referredPerson = opp.Customer_Reference__r.Name;
                 ref.referralId = opp.Id;
-                ref.status = (opp.Account.Booked_Opportunities__c > 0)? 'Active' : 'Inactive';
+                ref.status = (opp.Customer_Reference__r.Booked_Opportunities__c > 0)? 'Active' : 'Inactive';
                 ref.saleValue = 0;
                 siteVisits.add(ref);
             }
@@ -75,6 +93,11 @@ global class PineLabs_EarnModule {
                             refLeadPointsMap.put(cust, 'First Lead');
                             freshRefLeads.add(cust);
                         }
+                    }else if(custVsOpps.get(cust) != null && custVsOpps.get(cust).size() == 1){
+                        if(custVsLeads.get(cust).size() == 1 && referralLeadsToday.containsKey(custVsLeads.get(cust)[0].Id)){
+                            refLeadPointsMap.put(cust, 'First Lead');
+                            freshRefLeads.add(cust);
+                        }
                     }
                 }
                 
@@ -83,7 +106,8 @@ global class PineLabs_EarnModule {
             Map<String, List<Decimal>> ref20PaidBkgs = new Map<String, List<Decimal>>();
             List<RefDetails> closedRefs = new List<RefDetails>();
             Date dt = Date.today() - 3;
-            Map<Id, Booking__c> bkgs = new Map<Id, Booking__c>([SELECT Id, Allotment_Premium__c, Customer_Reference__c, Opportunity__r.Account.Mobile_No__c, Opportunity__r.Account.Name, Opportunity__r.AccountId, Opportunity__r.Account.Booked_Opportunities__c FROM Booking__c WHERE Customer_Reference__c != null AND X20_Received_Date__c =: dt]);
+            //Map<Id, Booking__c> bkgs = new Map<Id, Booking__c>([SELECT Id, Allotment_Premium__c, Customer_Reference__c, Opportunity__r.Account.Mobile_No__c, Opportunity__r.Account.Name, Opportunity__r.AccountId, Opportunity__r.Account.Booked_Opportunities__c FROM Booking__c WHERE Customer_Reference__c != null AND X20_Received_Date__c = YESTERDAY]);
+            Map<Id, Booking__c> bkgs = new Map<Id, Booking__c>([SELECT Id, Allotment_Premium__c, Customer_Reference__c, Opportunity__r.Account.Mobile_No__c, Opportunity__r.Account.Name, Opportunity__r.AccountId, Opportunity__r.Account.Booked_Opportunities__c FROM Booking__c WHERE Customer_Reference__c != null AND X20_Received_Date__c >=: (fromDate - 1) AND X20_Received_Date__c <: (toDate - 1)]);
             if(bkgs.size() > 0){
                 for(Booking__c bkg : bkgs.values()){
                     if(ref20PaidBkgs.get(bkg.Customer_Reference__c) == null){
@@ -107,8 +131,8 @@ global class PineLabs_EarnModule {
             det.siteVisits = refSiteVisits;
             det.closedReferrals = ref20PaidBkgs;
             
-            Date dateAfert7Days = Date.today() + 4;
-            List<RW_Demand__c> demands = [SELECT Id, Booking__r.Opportunity__r.AccountId,Booking__r.Opportunity__r.Account.Mobile_No__c FROM RW_Demand__c WHERE RW_Demand_Status__c = 'Paid' AND Due_Date__c =: dateAfert7Days AND LastModifiedDate = YESTERDAY];
+            Date dateAfert7Days = Date.today() + 7;
+            List<RW_Demand__c> demands = [SELECT Id, Booking__r.Opportunity__r.AccountId,Booking__r.Opportunity__r.Account.Mobile_No__c FROM RW_Demand__c WHERE RW_Demand_Status__c = 'Paid' AND Due_Date__c =: dateAfert7Days AND LastModifiedDate = YESTERDAY AND Booking__r.Customer_Reference__c != null];
             List<Payment> onTimePayments = new List<Payment>();
             for(RW_Demand__c dem : demands){
                 Payment pay = new Payment();
@@ -143,9 +167,96 @@ global class PineLabs_EarnModule {
             res.responseBody = Blob.valueOf(JSON.serialize(errorResult));
             res.statusCode = 400;
         }
+    }*/
+    
+    @HttpGet
+    global static void doGet(){
+        RestRequest req = RestContext.request;
+        RestResponse res = RestContext.response;
+        res.addHeader('Content-Type', 'application/json');
+        Map<String, Object> errorResult = new Map<String, Object>();
+        List<String> freshRefLeads = new List<String>();
+        Date fromDate;
+        Date toDate;
+        if(req != null && req.requestBody != null){
+            system.debug('req: ' + req.requestBody);
+            String jsonBody = req.requestBody.toString();
+            system.debug('jsonBody: ' + jsonBody);
+            
+            if(String.isNotBlank(jsonBody)){
+                DateRange resData = (DateRange)JSON.deserialize(jsonBody, DateRange.class);
+                
+                if(resData != null){
+                    fromDate = (resData.fromDate != '')? Date.valueOf(resData.fromDate) : null;
+                    toDate = (resData.toDate != '')? Date.valueOf(resData.toDate) : null;
+                }
+            }
+        }
+        try{
+            List<Referral_Points__c> refPoints = [SELECT Id,Type__c,Lead__c,Opportunity__c,Booking__c,Demand__c,Customer_Reference__c,
+                                                  Customer_Reference__r.Name,Customer_Reference__r.Mobile_No__c,Customer_Reference__r.Booked_Opportunities__c,
+                                                  Booking__r.Allotment_Premium__c, CreatedDate FROM Referral_Points__c WHERE CreatedDate >=: fromDate AND CreatedDate <: toDate];
+            Details1 det = new Details1();
+            List<RefDetails> freshLeads = new List<RefDetails>();
+            List<RefDetails> siteVisits = new List<RefDetails>();
+            List<RefDetails> closedRefs = new List<RefDetails>();
+            List<Payment> onTimePayments = new List<Payment>();
+            for(Referral_Points__c ref : refPoints){
+                if(ref.Type__c == 'Fresh Lead'){
+                    RefDetails rd = new RefDetails();
+                    rd.customerId = ref.Customer_Reference__r.Mobile_No__c;
+                    rd.referredPerson = ref.Customer_Reference__r.Name;
+                    rd.referralId = ref.Lead__c;
+                    rd.status = (ref.Customer_Reference__r.Booked_Opportunities__c > 0)? 'Active' : 'Inactive';
+                    rd.saleValue = 0;
+                    rd.sfdcId = ref.Id;
+                    rd.createdDate = String.valueOf(Date.valueOf(ref.CreatedDate));
+                    freshLeads.add(rd);
+                }else if(ref.Type__c == 'Site Visit'){
+                    RefDetails rd = new RefDetails();
+                    rd.customerId = ref.Customer_Reference__r.Mobile_No__c;
+                    rd.referredPerson = ref.Customer_Reference__r.Name;
+                    rd.referralId = ref.Opportunity__c;
+                    rd.status = (ref.Customer_Reference__r.Booked_Opportunities__c > 0)? 'Active' : 'Inactive';
+                    rd.saleValue = 0;
+                    rd.sfdcId = ref.Id;
+                    rd.createdDate = String.valueOf(Date.valueOf(ref.CreatedDate));
+                    siteVisits.add(rd);
+                }else if(ref.Type__c == 'Closed Referral'){
+                    RefDetails rd = new RefDetails();
+                    rd.customerId = ref.Customer_Reference__r.Mobile_No__c;
+                    rd.referredPerson = ref.Customer_Reference__r.Name;
+                    rd.referralId = ref.Booking__c;
+                    rd.status = (ref.Customer_Reference__r.Booked_Opportunities__c > 0)? 'Active' : 'Inactive';
+                    rd.saleValue = ref.Booking__r.Allotment_Premium__c;
+                    rd.sfdcId = ref.Id;
+                    rd.createdDate = String.valueOf(Date.valueOf(ref.CreatedDate));
+                    closedRefs.add(rd);
+                }else if(ref.Type__c == 'On Time Payment'){
+                    Payment pay = new Payment();
+                    pay.customerId = ref.Customer_Reference__r.Mobile_No__c;
+                    pay.status = 'Yes';
+                    pay.sfdcId = ref.Id;
+                    pay.createdDate = String.valueOf(Date.valueOf(ref.CreatedDate));
+                    onTimePayments.add(pay);
+                }
+            }
+            det.freshLeads = freshLeads;
+            det.siteVisits = siteVisits;
+            det.closedRefs = closedRefs;
+            det.onTimePayments = onTimePayments;
+            res.responseBody = Blob.valueOf(JSON.serialize(det));
+            res.statusCode = 200;
+            
+        }catch(exception e){
+            errorResult.put('status', 'error');
+            errorResult.put('message', e.getMessage() + ';  ' + e.getStackTraceString());
+            res.responseBody = Blob.valueOf(JSON.serialize(errorResult));
+            res.statusCode = 400;
+        }
     }
     
-    @HttpPost
+    /*@HttpPost
     global static void doPost(){
         RestRequest req = RestContext.request;
         RestResponse res = RestContext.response;
@@ -202,11 +313,69 @@ global class PineLabs_EarnModule {
             res.statusCode = 400;
         }
         
+    }*/
+    
+    @HttpPost
+    global static void doPost(){
+        RestRequest req = RestContext.request;
+        RestResponse res = RestContext.response;
+        res.addHeader('Content-Type', 'application/json');
+        Map<String, Object> errorResult = new Map<String, Object>();
+        try{
+            system.debug('req: ' + req.requestBody);
+            String jsonBody = req.requestBody.toString();
+            system.debug('jsonBody: ' + jsonBody);
+            List<Points> resData = (List<Points>)JSON.deserialize(jsonBody, List<Points>.class);
+            system.debug('resData: ' + resData);
+            List<Referral_Points__c> refToUpdate = new List<Referral_Points__c>();
+            Map<String,String> pointsMap = new Map<String, String>();
+            Set<String> customers = new Set<String>();
+            for(Points point : resData){
+                pointsMap.put(point.customerId + '_' + point.pointsType, point.points);
+                customers.add(point.customerId);
+            }
+            List<Referral_Points__c> refPoints = [SELECT Id,Customer_Reference__c,Type__c, Points__c,Customer_Reference__r.Mobile_No__c FROM Referral_Points__c WHERE Customer_Reference__r.Mobile_No__c =: customers AND Points__c = null];
+            Map<String,List<Referral_Points__c>> refMap = new Map<String, List<Referral_Points__c>>();
+            for(Referral_Points__c ref : refPoints){
+                if(refMap.get(ref.Customer_Reference__r.Mobile_No__c + '_' + ref.Type__c) == null){
+                    refMap.put(ref.Customer_Reference__r.Mobile_No__c + '_' + ref.Type__c, new List<Referral_Points__c>{ref});
+                }else{
+                    refMap.get(ref.Customer_Reference__r.Mobile_No__c + '_' + ref.Type__c).add(ref);
+                }
+            }
+            for(Points point : resData){
+                for(Referral_Points__c ref : refPoints){
+                    if(point.customerId == ref.Customer_Reference__r.Mobile_No__c && point.pointsType == ref.Type__c && ref.Points__c == null){
+                        ref.Points__c = point.points;
+                        refToUpdate.add(ref);
+                    }
+                }
+            }
+            /*for(Points point : resData){
+                if(refMap.get(point.customerId + '_' + point.pointsType).size() > 1){
+                    
+                    
+                }
+                Referral_Points__c ref = new Referral_Points__c();
+                ref.Id = refMap.get(point.customerId + '_' + point.pointsType)[0].Id;
+                ref.Points__c = point.points;
+                refToUpdate.add(ref);
+            }*/
+            if(refToUpdate.size() > 0){
+                update refToUpdate;
+            }
+        }catch(exception e){
+            errorResult.put('status', 'error');
+            errorResult.put('message', e.getMessage() + ';  ' + e.getStackTraceString());
+            res.responseBody = Blob.valueOf(JSON.serialize(errorResult));
+            res.statusCode = 400;
+        }
     }
     
     global class Points{
         public String customerId;
         public String points;
+        public String pointsType;
     }
     
 
@@ -239,11 +408,20 @@ global class PineLabs_EarnModule {
         public String referralId;
         public String status;
         public Decimal saleValue;
+        public String sfdcId;
+        public String createdDate;
     }
     
     public class Payment{
         public String customerId;
         public String status;
+        public String sfdcId;
+        public String createdDate;
+    }
+    
+    global class DateRange{
+        public String fromDate;
+        public String toDate;
     }
     
 
