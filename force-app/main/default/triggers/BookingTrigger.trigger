@@ -231,6 +231,8 @@ trigger BookingTrigger on Booking__c (after Insert, after update,before update) 
         List<Brokerage_Summary__c> BrokerSummaryList = new List<Brokerage_Summary__c>();
         List<Brokerage__c> BrokerageList = new List<Brokerage__c>();
         list<id> bidsonSchUpdate = new list<id>();//Added by Prashant .... 20-05-2025..
+        Date yesterDay = Date.today() - 1; //Added by Vinay 15-10-2025
+        List<Booking__c> closedRefs = new List<Booking__c>(); //Added by Vinay 15-10-2025
         for(Booking__c bk: trigger.new){
             if(( trigger.newMap.get(bk.id).RW_Registration_Done__c == 'Yes' 
                && bk.Brokerage_Scheme__c != null && bk.BrokerIId__c != null && bk.RW_X9_99_Received__c == true )){
@@ -290,6 +292,9 @@ trigger BookingTrigger on Booking__c (after Insert, after update,before update) 
             }
             //Added by Prashant to update brokerage % whenever scheme is updated ///Added by Prashant. 20-05-2025..//End/////
             //
+            if(bk.Customer_Reference__c != null && trigger.oldMap.get(bk.Id).X20_Received_Date__c != bk.X20_Received_Date__c && bk.X20_Received_Date__c == yesterDay){
+                closedRefs.add(bk);
+            }
         }
         if(!bidsonSchUpdate.isEmpty()){
             BookingTriggerHandler.updateBrokerageonSchemeChange(bidsonSchUpdate);//Added by Prashant to update brokerage % whenever scheme is updated ///Added by Prashant. 20-05-2025..///////
@@ -333,6 +338,10 @@ trigger BookingTrigger on Booking__c (after Insert, after update,before update) 
 
         if(cancelledOppIds.size() > 0){ // Added by coServe 29-03-2025
             SalesorderUpdateCallout.cancelsalesorder(cancelledOppIds);
+        }
+        
+        if(closedRefs.size() > 0){ //Added by Vinay 15-10-2025
+            ReferralPointsModule.closedReferrals(closedRefs);
         }
         
     }
