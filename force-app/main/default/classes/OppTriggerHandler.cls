@@ -247,6 +247,7 @@ eachOpp.Customer_reference_SAP_Code__c = lstotp[0].Customer_reference_SAP_Code__
         Set<Id> retentionOppIds = new Set<Id>(); // Added by coServe 20-01-2023
         list<Event> lstEventInsert = new list<Event>();  
         List<String> oppIds = new List<String>(); // Added by coServe 27-06-2024
+        List<Opportunity> referralOpps = new List<Opportunity>(); //Added by Vinay 15-10-2025
         if(lstOpp.size() > 0)
         {
             for(Opportunity eachOpp : lstOpp)
@@ -263,11 +264,17 @@ eachOpp.Customer_reference_SAP_Code__c = lstotp[0].Customer_reference_SAP_Code__
                 }
                 // Added by coServe 20-01-2023 End
                 
+                if(eachOpp.StageName == 'Site Visit'eachOpp.LeadSource == 'Referral' && eachOpp.Customer_Reference__c != null){ //Added by Vinay 15-10-2025
+                    referralOpps.add(eachOpp);
+                }
                 
             }
             system.debug('setIdofProjUnit>>>>'+setIdofProjUnit);
             if(oppIds.size() > 0){ // Added by coServe 27-06-2024
                 //sendProspectDay1WhatsApp(oppIds);
+            }
+            if(referralOpps.size() > 0){ //Added by Vinay 15-10-2025
+                ReferralPointsModule.referralSiteVisits(referralOpps);
             }
         }
         if(setofOppId.size() > 0)
@@ -1181,8 +1188,13 @@ if(quoteIds.size() > 0){
             for(String oppId : oppMap.keySet()){
                 if(oppVsCifMap.get(oppId) != null && !Test.isRunningTest()){
                     //SendWhatsAppMsg.methodToSendWhatsAppMsg(null, oppMap.get(oppId).Name, oppMap.get(oppId).RW_Project__r.Name, oppMap.get(oppId).RW_Project__r.Day_1_Whatsapp_Content__c, oppMap.get(oppId).RW_Project__r.WhatsApp_Bot_Project_Brochure_Url__c, oppMap.get(oppId).RW_Project__r.Prospect_Engagement_Team__c, null, null, null, oppMap.get(oppId).Account.Country_Code__c, oppMap.get(oppId).RW_Mobile_No__c, 'Prospect Engagement Day 1');
-                    //SendWhatsAppMsg.genaricMethodToSendWhatsAppMsg(oppMap.get(oppId).Name, oppMap.get(oppId).RW_Project__r.Name, oppMap.get(oppId).RW_Project__r.Day_1_Whatsapp_Content__c, oppMap.get(oppId).RW_Project__r.WhatsApp_Bot_Project_Brochure_Url__c, oppMap.get(oppId).RW_Project__r.Prospect_Engagement_Team__c, null, null, null, null, oppMap.get(oppId).RW_Mobile_No__c, 'Prospect Engagement Day 1'); //Commented by Vinay 29-08-2025
-                    SendWhatsAppMsg.methodToSendWhatsAppMsgNew(oppMap.get(oppId).Name, oppMap.get(oppId).RW_Project__r.Name, oppMap.get(oppId).RW_Project__r.Day_1_Whatsapp_Content__c, oppMap.get(oppId).RW_Project__r.WhatsApp_Bot_Project_Brochure_Url__c, oppMap.get(oppId).RW_Project__r.Prospect_Engagement_Team__c, null, null, null, null, oppMap.get(oppId).Account.Country_Code__c, oppMap.get(oppId).RW_Mobile_No__c, 'Prospect Engagement Day 1'); //Added by Vinay 29-08-2025
+                    //SendWhatsAppMsg.genaricMethodToSendWhatsAppMsg(oppMap.get(oppId).Name, oppMap.get(oppId).RW_Project__r.Name, oppMap.get(oppId).RW_Project__r.Day_1_Whatsapp_Content__c, oppMap.get(oppId).RW_Project__r.WhatsApp_Bot_Project_Brochure_Url__c, oppMap.get(oppId).RW_Project__r.Prospect_Engagement_Team__c, null, null, null, null, oppMap.get(oppId).RW_Mobile_No__c, 'Prospect Engagement Day 1'); //Commented by Vinay 13-10-2025
+                    
+                    if(System.label.Haptik_API_Version == 'New'){ //Added by Vinay 13-10-2025
+                        SendWhatsAppMsg.methodToSendWhatsAppMsgNew(oppMap.get(oppId).Name, oppMap.get(oppId).RW_Project__r.Name, oppMap.get(oppId).RW_Project__r.Day_1_Whatsapp_Content__c, oppMap.get(oppId).RW_Project__r.WhatsApp_Bot_Project_Brochure_Url__c, oppMap.get(oppId).RW_Project__r.Prospect_Engagement_Team__c, null, null, null, null, oppMap.get(oppId).Account.Country_Code__c, oppMap.get(oppId).RW_Mobile_No__c, 'Prospect Engagement Day 1');
+                    }else{
+                        SendWhatsAppMsg.genaricMethodToSendWhatsAppMsg(oppMap.get(oppId).Name, oppMap.get(oppId).RW_Project__r.Name, oppMap.get(oppId).RW_Project__r.Day_1_Whatsapp_Content__c, oppMap.get(oppId).RW_Project__r.WhatsApp_Bot_Project_Brochure_Url__c, oppMap.get(oppId).RW_Project__r.Prospect_Engagement_Team__c, null, null, null, null, oppMap.get(oppId).RW_Mobile_No__c, 'Prospect Engagement Day 1');
+                    }
                 }
             }
         }
