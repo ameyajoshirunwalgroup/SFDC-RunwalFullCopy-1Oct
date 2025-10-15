@@ -108,6 +108,7 @@ eachLead.RW_Customer_Mobile_Number__c = eachLead.RW_Mobile_No__c;
         List<Id> leadIds = new List<Id>();
         List<String> digitalLeadIds = new List<String>(); //Added by Vinay 23-09-2025
         //List<Id> loyaltyLeadIds= new List<Id>();  // Commented by Vinay 28-05-2025 to stop round robin auto assignment
+        List<Lead> referralLeads = new List<Lead>(); //Added by Vinay 15-10-2025
         for(Lead ld : lstLead){
             if(ld.LeadSource == 'Retention' && (ld.Retention_RM_Name__c != null || ld.Retention_Closing_Head_Name__c!= null || ld.Retention_Presales_User__c != null || ld.Retention_Sales_Manager__c != null)){
                 leadIds.add(ld.Id);
@@ -120,10 +121,15 @@ eachLead.RW_Customer_Mobile_Number__c = eachLead.RW_Mobile_No__c;
 if(loyaltyLeadSources.contains(ld.LeadSource)){ //Added by coServe 26-07-2024
 loyaltyLeadIds.add(ld.Id);
 }*/
-            
+            if(ld.LeadSource == 'Referral' && ld.Customer_Reference__c != null){ //Added by Vinay 15-10-2025
+                referralLeads.add(ld);
+            }
         }
         if(digitalLeadIds.size() > 0){ //Added by Vinay 23-09-2025
             //system.enqueuejob(new DigitalLeadAssignment(digitalLeadIds));
+        }
+        if(referralLeads.size() > 0){ //Added by Vinay 15-10-2025
+            ReferralPointsModule.referralFreshLeads(referralLeads);
         }
         if(leadIds.size()>0){
             List<Lead> leadList = [SELECT Id, Name, LeadSource, Retention_RM_Name__c,Retention_RM_Name__r.FirstName, Retention_RM_Name__r.LastName,
