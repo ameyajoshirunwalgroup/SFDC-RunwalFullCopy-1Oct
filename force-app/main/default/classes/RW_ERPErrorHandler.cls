@@ -8,7 +8,7 @@ public class RW_ERPErrorHandler {
         String ExceptionTemplate= 'Dear Team, <br/><br/>';
         ExceptionTemplate +=  'Below Records have errored out due to connection issue to the API, It will be tried to reprocess again<br/><br/><html><head><style>table{border-collapse: collapse;}table, td, th {border: 1px solid black;}</style></head><body><table><tr><th>API Type</th><th>Log Link</th></tr>';
         //string url = System.Label.RW_Production_Url; //Commented by Vinay 20-10-2025
-        string url = System.Label.Org_Base_Url; //Added by Vinay 20-10-2025
+        string url = System.Label.Org_Base_Url + '/'; //Added by Vinay 20-10-2025
         integer errcount =0;
         integer excount = 0;
         for(ERP_Integration_Log__c erp : errorLogs){
