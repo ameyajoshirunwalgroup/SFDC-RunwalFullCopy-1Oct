@@ -29,8 +29,8 @@ global without sharing class LockatedApp_PostSales {
                     List<Booking__c> bkgs = [SELECT Id,Name,RW_Registration_Date__c,Booking_Date__c,RW_Key_handover_date__c,No_of_Parking__c,Parking_Type__c,NCF_Status__c,
                                              Unit_No__r.Type__c,Unit_No__r.Carpet_Area__c,Unit_No__r.Utility_Area__c,Project__r.Name,Project__r.RERA_Certificate_No__c,
                                              Unit_No__r.Name,Unit_No__r.RW_Param3__c,Unit_No__r.RW_Param2__c,Allotment_Premium__c,RW_Total_Demand_Raised__c,Unit_No__r.Deck_Area__c,
-                                             RW_Total_Receipt_Amount_Received__c,FBL5N__c,RW_Registration_Status__c,RW_SDR_Status__c,Stamp_duty_Paid__c,
-                                             Unit_No__r.Relationship_Manager__r.did_number_from_user__c,RW_X9_99_Received__c,
+                                             RW_Total_Receipt_Amount_Received__c,FBL5N__c,RW_Registration_Status__c,RW_SDR_Status__c,Stamp_duty_Paid__c,Unit_No__r.TowerName__r.RERA_Certificate_No__c,
+                                             Unit_No__r.Relationship_Manager__r.did_number_from_user__c,RW_X9_99_Received__c,Unit_No__r.RW_Param4__c,Unit_No__r.Total_RERA_Carpet_Area__c,
                                              RW_Total_SDR_Amount_Payable__c,RW_RM_Email__c,RM_Name__c,Unit_No__r.Relationship_Manager__r.Contact_Number__c,
                                              Sales_Managers__c,Owner.Name,Status__c,Date_of_Occupation_Certificate__c,Sales_Manager__r.Name,Unit_Type__c,
                                              Opportunity__r.Account.Country_Code__c,Opportunity__r.Account.Mobile_No__c,Opportunity__r.Account.PersonEmail,Opportunity__r.Account.RW_Email__c,Opportunity__r.Account.LastName,
@@ -39,7 +39,7 @@ global without sharing class LockatedApp_PostSales {
                                              (SELECT Id,DOB__c,Permanent_Address__c,Address_Proof_Number__c,PancardNo__c,Gender__c,Mobile_Number__c,GSTIN_Number__c,Occupation__c,
                                               Email_Address__c,Last_Name__c,First_Name__c,Applicant_Number__c,Correspondence_Address__c,Organization_Name__c FROM ApplicantDetails__r),
                                              (SELECT Id,Name,RW_Fiscal_Year__c,RW_Company_Code__c,RW_Accounting_Document_Number__c,RW_Payment_Amount__c,
-                                              RW_Payment_Date__c FROM Payment_Details__r),Quotation__r.Registration_Charges__c,Quotation__r.Plan_Type__c,
+                                              RW_Payment_Date__c FROM Payment_Details__r  ORDER By CreatedDate DESC),Quotation__r.Registration_Charges__c,Quotation__r.Plan_Type__c,
                                              Quotation__r.Other_Charges_Amount_1__c,Quotation__r.Other_Charges_Desc_1__c,Quotation__r.Other_Charges_Category_1__c,
                                              Quotation__r.Other_Charges_Amount_2__c,Quotation__r.Other_Charges_Desc_2__c,Quotation__r.Other_Charges_Category_2__c,
                                              Quotation__r.Other_Charges_Amount_3__c,Quotation__r.Other_Charges_Desc_3__c,Quotation__r.Other_Charges_Category_3__c,
@@ -73,6 +73,16 @@ global without sharing class LockatedApp_PostSales {
                             bkgIdVsLoanMap.put(ln.RW_Booking__c, ln);
                         }
                         
+                        List<Car_Parking_Charge__c> parkings = [SELECT Id,Parking__c,Booking__c FROM Car_Parking_Charge__c WHERE Booking__c =: bkIds];
+                        Map<String,List<String>> bkgIdVsParkingsMap = new Map<String, List<String>>();
+                        for(Car_Parking_Charge__c park : parkings){
+                            if(bkgIdVsParkingsMap.get(park.Booking__c) != null){
+                                bkgIdVsParkingsMap.get(park.Booking__c).add(park.Parking__c);
+                            }else{
+                                bkgIdVsParkingsMap.put(park.Booking__c, new List<String>{park.Parking__c}); 
+                            }
+                        }
+                        
                         System.debug('acc.Country_Code__c: ' +bkgs[0].Opportunity__r.Account.Country_Code__c);
                         LockatedApp_PostSalesWrapper.customer cust = new LockatedApp_PostSalesWrapper.customer();
                         det.customer = cust;
@@ -103,6 +113,7 @@ global without sharing class LockatedApp_PostSales {
                         
                         for(Booking__c bkg : bkgs){
                             LockatedApp_PostSalesWrapper.booking_details bkgDet = new LockatedApp_PostSalesWrapper.booking_details();
+                            bkgDet.bookingId = bkg.Id;
                             bkgDet.is_primary = '1';
                             bkgDet.registration_date = (bkg.RW_Registration_Date__c != null)? String.valueOf(bkg.RW_Registration_Date__c) : null;
                             bkgDet.booking_date = (bkg.Booking_Date__c != null)? String.valueOf(bkg.Booking_Date__c) : null;
@@ -110,20 +121,24 @@ global without sharing class LockatedApp_PostSales {
                             //bkgDet.garden_facing = ''; // Need confirm this mapping - Not required
                             bkgDet.no_of_parkings = (bkg.No_of_Parking__c != null)? Integer.valueOf(bkg.No_of_Parking__c) : null;
                             bkgDet.type_of_parking = bkg.Parking_Type__c;
+                            //bkgDet.type_of_parking = bkgIdVsParkingsMap.get(bkg.Id);
                             bkgDet.configuration_type = bkg.Unit_No__r.Type__c;
-                            bkgDet.carpet_area = (bkg.Unit_No__r.Carpet_Area__c != null)? Integer.valueOf(bkg.Unit_No__r.Carpet_Area__c) : null;
-                            bkgDet.utility_area = (bkg.Unit_No__r.Utility_Area__c != null)? Integer.valueOf(bkg.Unit_No__r.Utility_Area__c) : null;
-                            bkgDet.balcony_area = Integer.valueOf(bkg.Unit_No__r.Deck_Area__c); 
+                            bkgDet.carpet_area = (bkg.Unit_No__r.Carpet_Area__c != null)? bkg.Unit_No__r.Carpet_Area__c : null;
+                            bkgDet.utility_area = (bkg.Unit_No__r.Utility_Area__c != null)? bkg.Unit_No__r.Utility_Area__c : null;
+                            bkgDet.balcony_area = bkg.Unit_No__r.Deck_Area__c; 
+                            bkgDet.rera_carpet_area = (bkg.Unit_No__r.Total_RERA_Carpet_Area__c != null)? bkg.Unit_No__r.Total_RERA_Carpet_Area__c : null;
                             bkgDet.project_name = bkg.Project__r.Name;
                             bkgDet.rera_project_name = bkg.Project__r.Name; 
-                            bkgDet.rera_id = bkg.Project__r.RERA_Certificate_No__c; 
+                            //bkgDet.rera_id = bkg.Project__r.RERA_Certificate_No__c; 
+                            bkgDet.rera_id = bkg.Unit_No__r.TowerName__r.RERA_Certificate_No__c;
                             if(!String.isBlank(bkg.Project__r.WhatsApp_Bot_Project_Image_File_Id__c)){
                                 List<ContentDistribution> distrList = [SELECT Id, Name, DistributionPublicUrl, ContentDocumentId FROM ContentDistribution 
                                                                        WHERE ContentDocumentId =: bkg.Project__r.WhatsApp_Bot_Project_Image_File_Id__c];
                                 bkgDet.project_logo = (distrList.size() > 0)? distrList[0].DistributionPublicUrl : null; 
                             }
                             
-                            bkgDet.unit = bkg.Unit_No__r.Name;
+                            //bkgDet.unit = bkg.Unit_No__r.Name;
+                            bkgDet.unit = bkg.Unit_No__r.RW_Param4__c;
                             Map<String, String> valueToLabelMap = new Map<String, String>();
                             for (Schema.PicklistEntry ple : Booking__c.Unit_Type__c.getDescribe().getPicklistValues()) {
                                 valueToLabelMap.put(ple.getValue(), ple.getLabel());
@@ -186,8 +201,8 @@ global without sharing class LockatedApp_PostSales {
                             bkgDet.other_applicants = otherApplicants;
                             LockatedApp_PostSalesWrapper.stages stages = new LockatedApp_PostSalesWrapper.stages();
                             stages.booking_details_status = (bkg.Status__c == 'Booking Confirmed')? 'Completed' : 'Pending';
-                            stages.ncf_status = (bkg.NCF_Status__c == 'Booking Confirmed')? 'Completed' : 'Pending';
-                            stages.registration_status = (bkg.RW_Registration_Status__c == 'Booking Confirmed')? 'Completed' : 'Pending';
+                            stages.ncf_status = (bkg.NCF_Status__c == 'Completed')? 'Completed' : 'Pending';
+                            stages.registration_status = (bkg.RW_Registration_Status__c == 'Registration Completed')? 'Completed' : 'Pending';
                             stages.sales_deed_status = (bkg.Status__c == 'Cancellation Initiated' && bkg.Deed_of_Cancellation_Upload_Date__c != null && bkg.Cancellation_Deed_Uploaded__c == true)? 'Completed' : 'Pending';
                             stages.stamp_duty_status = (bkg.RW_SDR_Status__c == 'Received')? 'Completed' : 'Pending';
                             stages.oc_status = (bkg.Date_of_Occupation_Certificate__c !=  null)? 'Completed' : 'Pending';
