@@ -26,17 +26,20 @@ global class LockatedApp_PostSalesWrapper {
 	}
 
 	public class booking_details {
+        public String bookingId;
 		public String is_primary;
 		public String registration_date;
 		public String booking_date;
 		public String handover_date;
 		//public String garden_facing;
 		public Integer no_of_parkings;
-		public String type_of_parking;
+        public String type_of_parking;
+		//public List<String> type_of_parking;
 		public String configuration_type;
-		public Integer carpet_area;
-		public Integer utility_area;
-		public Integer balcony_area;
+		public Decimal carpet_area;
+		public Decimal utility_area;
+		public Decimal balcony_area;
+        public Decimal rera_carpet_area;
 		public String project_name;
 		public String rera_project_name;
 		public String rera_id;
@@ -69,6 +72,8 @@ global class LockatedApp_PostSalesWrapper {
         public String ncf_url;
 		public String grand_total;
 		public String booking_number;
+        public String homeLoanRmName;
+        public String homeLoanRmContact;
 		public List<other_applicants> other_applicants;
 		public stages stages;
 		public List<payment_receipt> payment_receipt;
@@ -104,6 +109,8 @@ global class LockatedApp_PostSalesWrapper {
 		public String stamp_duty_status;
 		public String oc_status;
 		public String possession_status;
+        public String payment_9_9_status;
+		public String sanction_status;
 	}
 
 	public class payment_receipt {
