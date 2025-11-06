@@ -48,7 +48,7 @@ global class LockatedApp_PostSalesWrapper {
         public String unit_type;
 		public String floor;
 		public String tower;
-		public Integer agreement_value;
+		public Decimal agreement_value;
 		public Integer total_demanded;
 		public Integer total_received;
 		public String amount_due;
@@ -60,6 +60,7 @@ global class LockatedApp_PostSalesWrapper {
 		public String rm_email;
 		public String rm_mobile;
 		public String rm_name;
+        public String ivr_number;
 		public String sales_manager_name;
 		public String ownership;
 		public String status;
@@ -70,10 +71,12 @@ global class LockatedApp_PostSalesWrapper {
         public String total_outstanding_a;
         public String total_outstanding_b;
         public String ncf_url;
-		public String grand_total;
+        public String stamp_duty_paid_by;
+		public Decimal grand_total;
 		public String booking_number;
         public String homeLoanRmName;
         public String homeLoanRmContact;
+        public String homeloan_brochure;
 		public List<other_applicants> other_applicants;
 		public stages stages;
 		public List<payment_receipt> payment_receipt;
@@ -81,6 +84,7 @@ global class LockatedApp_PostSalesWrapper {
 		public List<milestones> milestones;
         public List<paymentsDue> paymentsDue;
 	}
+    
 
 	public class other_applicants {
 		public String date_of_birth;
@@ -121,6 +125,9 @@ global class LockatedApp_PostSalesWrapper {
 		public Decimal pr_amount;
 		public String pr_date;
 		public String pr_no;
+        public String milestone_name;
+        public String bank_name;
+        public String payment_date;
 	}
 
 	public class other_charges {

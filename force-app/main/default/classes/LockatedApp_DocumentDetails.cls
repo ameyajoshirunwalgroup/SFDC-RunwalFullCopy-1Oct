@@ -31,7 +31,15 @@ global class LockatedApp_DocumentDetails {
                     agr.title = 'Agreement';
                     agr.doc_number = '';
                     agr.doc_date = '';
-                    agr.url = 'https://runwal--fullcopy.sandbox.my.salesforce-sites.com/AgreementDoc/'+bkgs[0].RW_Signed_Agreement_Document_Id__c;
+                    //agr.url = 'https://runwal--fullcopy.sandbox.my.salesforce-sites.com/AgreementDoc/'+bkgs[0].RW_Signed_Agreement_Document_Id__c;
+                    RestRequest req10= new RestRequest(); 
+                    RestResponse res10 = new RestResponse();
+                    req10.requestURI = 'https://runwal--fullcopy.sandbox.my.salesforce.com/services/apexrest//AgreementDoc/'+bkgs[0].RW_Signed_Agreement_Document_Id__c; 
+                    req10.httpMethod = 'Get';
+                    req10.addHeader('Content-Type', 'application/json'); 
+                    RestContext.request = req10;
+                    RestContext.response = res10;
+                    agr.url = AgreementDocRest.doGet();
                     doc.agreement = agr;
                     
                     List<Applicant_Details__c> apps = [SELECT Id, Booking__c FROM Applicant_Details__c WHERE Booking__c =: bkgId AND Applicant_Number__c = 'Primary Applicant'];
@@ -142,15 +150,17 @@ doc.payment_receipts = receiptDocs;
     
     public static String distPublicUrl(String docId){
         if(docId != null){
-            ContentVersion file = [SELECT Id, Title FROM ContentVersion WHERE ContentDocumentId =: docId];
+            System.debug('docId: ' + docId);
+            List<ContentVersion> file = [SELECT Id, Title FROM ContentVersion WHERE ContentDocumentId =: docId];
+            System.debug('file: ' + file);
             List<ContentDistribution> dist = [SELECT Id, DistributionPublicUrl, ContentDownloadUrl FROM ContentDistribution 
-                                              WHERE ContentVersionId =: file.Id LIMIT 1];
+                                              WHERE ContentVersionId =: file[0].Id LIMIT 1];
             if(dist.size() > 0){
                 return dist[0].DistributionPublicUrl;
             }else{
                 ContentDistribution newDist = new ContentDistribution(
-                    Name = file.Title,
-                    ContentVersionId = file.Id,
+                    Name = file[0].Title,
+                    ContentVersionId = file[0].Id,
                     PreferencesAllowViewInBrowser= true,
                     PreferencesNotifyOnVisit = false);
                 insert newDist;
