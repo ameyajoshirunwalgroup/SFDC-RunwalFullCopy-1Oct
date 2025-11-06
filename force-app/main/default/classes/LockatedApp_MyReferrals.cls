@@ -20,6 +20,7 @@ global without sharing class LockatedApp_MyReferrals{
                 Booking__c bkg = [SELECT Id, Opportunity__r.AccountId, Opportunity__r.Account.Name FROM Booking__c WHERE Id =: bkgId AND Status__c = 'Booking Confirmed'];
                 String accId = bkg.Opportunity__r.AccountId;
                 String accName = bkg.Opportunity__r.Account.Name;
+                System.debug('accName: ' + accName);
                 List<Lead> referralLeads = [SELECT Id,Name,RW_Project__r.Name,CreatedDate,Status FROM Lead WHERE Customer_Reference__c =: accId];
                 Integer vcvpLeads = 0;
                 Integer lostLeads = 0;

@@ -56,7 +56,7 @@ global class LockatedApp_PrimaryApplicant {
                     }else if(apps.size() == 0){
                         Applicant_Details__c app = new Applicant_Details__c();
                         app.Name = resData.customerProfileDetails.PrimaryApplicants[0].fullName;
-                        app.DOB__c = Date.valueOf(resData.customerProfileDetails.PrimaryApplicants[0].birthDate);
+                        app.DOB__c = (resData.customerProfileDetails.PrimaryApplicants[0].birthDate != '')? Date.valueOf(resData.customerProfileDetails.PrimaryApplicants[0].birthDate) : null;
                         app.PancardNo__c = resData.customerProfileDetails.PrimaryApplicants[0].panCard;
                         app.GSTIN_Number__c = resData.customerProfileDetails.PrimaryApplicants[0].gstinNumber;
                         app.Organization_Name__c = resData.customerProfileDetails.PrimaryApplicants[0].companyName;
@@ -65,9 +65,10 @@ global class LockatedApp_PrimaryApplicant {
                         app.Email_Address__c = resData.customerProfileDetails.PrimaryApplicants[0].emailId;
                         app.Mobile_Number__c = resData.customerProfileDetails.PrimaryApplicants[0].mobileNumber;
                         app.Booking__c = resData.customerProfileDetails.booking;
-                        insert app;
                         res.responseBody = Blob.valueOf('Details updated successfully');
                 		res.statusCode = 200;
+                        insert app;
+                        
                     }
                 }
             }

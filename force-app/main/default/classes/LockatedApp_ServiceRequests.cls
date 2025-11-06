@@ -20,7 +20,7 @@ global class LockatedApp_ServiceRequests {
                 if(bkgs.size() > 0){
                     String accId = bkgs[0].Opportunity__r.AccountId;
                     List<Case> cases = [SELECT Id,CaseNumber,Status,Subject,RW_Case_Type__c,Customer_Lifecycle_Touchpoint__c,RW_Complaint_Type__c,
-                                        RW_Complaint_SubType__c,Description,CreatedDate FROM Case WHERE AccountId =: accId]; 
+                                        RW_Complaint_SubType__c,Description,CreatedDate FROM Case WHERE AccountId =: accId AND Status IN ('Open','Case Closed')]; 
                     List<String> caseIds = new List<String>();
                     for(Case cs : cases){
                         caseIds.add(cs.Id);
@@ -109,6 +109,13 @@ global class LockatedApp_ServiceRequests {
                 String base64Data = det.attachment;  
                 Blob fileBody = EncodingUtil.base64Decode(base64Data);
                 
+                FeedItem post = new FeedItem(
+                    ParentId = det.case_id,
+                    Body = det.description,
+                    Type = 'ContentPost'
+                );
+                insert post;
+                
                 ContentVersion cv = new ContentVersion(
                     VersionData = fileBody,
                     PathOnClient = det.fileName + '.' + det.fileType,
@@ -118,12 +125,7 @@ global class LockatedApp_ServiceRequests {
                 
                 //Id contentDocumentId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :cv.Id].ContentDocumentId;
                 
-                FeedItem post = new FeedItem(
-                    ParentId = det.case_id,
-                    Body = det.description,
-                    Type = 'ContentPost'
-                );
-                insert post;
+                
                 
                 FeedAttachment fa = new FeedAttachment(
                     FeedEntityId = post.Id,
