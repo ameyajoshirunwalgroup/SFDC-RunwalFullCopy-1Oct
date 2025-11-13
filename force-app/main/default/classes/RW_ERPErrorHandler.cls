@@ -145,5 +145,11 @@ public class RW_ERPErrorHandler {
             System.debug('The email failed to send: ' + results);
         }
     }
+
+    @InvocableMethod(Label='Re-Trigger failed Sales Orders')
+    public static void reTriggerSalesOrder (List<Id> ids){ //Added by Vinay 13-11-2025
+
+        SalesOrderUpdateCallout.UpdateSO(new Set<Id>(ids));
+    }
     
 }
