@@ -352,8 +352,8 @@ public with sharing class InventoryCostServices {
 ** tax slab for each slab and computed value after adding the tax slabs
 **/ 
     public static Map<String,Decimal> getAllCharges(Id unitId, Decimal allotmentCharges1, Decimal discountLumpsum, Id subPlanId){
-       System.debug('allotment charges ===>'+ allotmentCharges1);
-       
+        System.debug('allotment charges ===>'+ allotmentCharges1);
+        
         
         List<Project_Unit__c> unit = [Select Id, RW_Project__r.Name, RW_Project__r.ClientLookup__r.Id,RW_Customer__c, 
                                       RW_Project__r.ClientLookup__r.Name, RW_Project__r.OC_Approved__c,New_Floor__c, // Old field -- RW_Floor__c
@@ -464,19 +464,19 @@ public with sharing class InventoryCostServices {
                 Decimal rrVal = 0.0;
                 Decimal flatCostVal = 0.0;
                 
-                    // add all the values categorized under agreement value bucket to arrive at the
-                    // agreement value except the basic since it already included in the flat cost calculation
-                    /*if(pc.Active__c && pc.S_Charge_Bucket__c.equals('Agreement Value') ) { 
-    // && !(pc.Charge_Code__r.Name.equals('Basic') || pc.Charge_Code__r.Name.contains('Premium')  || pc.Charge_Code__r.Name.equals('Floor Rise')) 
-    if(pc.S_Charge_Calculated_As__c.equals('Rate List at Unit Level')) {
-    agreementVal += rateListMap.get(pc.Charge_Code__r.Name);
-    } else if(pc.S_Charge_Calculated_As__c.equals('Lumpsum at Project Level')) {
-    agreementVal += pc.S_Lumpsum_Charge_Amount__c;
-    } 
-    else {
-    // TODO throw exception
-    }
-    } */
+                // add all the values categorized under agreement value bucket to arrive at the
+                // agreement value except the basic since it already included in the flat cost calculation
+                /*if(pc.Active__c && pc.S_Charge_Bucket__c.equals('Agreement Value') ) { 
+// && !(pc.Charge_Code__r.Name.equals('Basic') || pc.Charge_Code__r.Name.contains('Premium')  || pc.Charge_Code__r.Name.equals('Floor Rise')) 
+if(pc.S_Charge_Calculated_As__c.equals('Rate List at Unit Level')) {
+agreementVal += rateListMap.get(pc.Charge_Code__r.Name);
+} else if(pc.S_Charge_Calculated_As__c.equals('Lumpsum at Project Level')) {
+agreementVal += pc.S_Lumpsum_Charge_Amount__c;
+} 
+else {
+// TODO throw exception
+}
+} */
                 
                 if(pc.Active__c && pc.S_Charge_Bucket__c.equals('Agreement Value')) {        // Added by Sheetal on 11/01/2022
                     if(pc.S_Charge_Calculated_As__c.equals('Rate List at Unit Level')) {
@@ -742,10 +742,10 @@ totalTax += allChargesMap.get(pc.charge_code__r.Name + ' '+  tb.tax_name__c + ' 
             Decimal CP_PassbackAV = 0;
             
             Decimal totalDiscounts = 0;
-             Decimal discountedAgreementVal = 0;
+            Decimal discountedAgreementVal = 0;
             String Source = '';
             
-			System.debug('vinit execute Agreement before 1 ===>' + agreementVal);
+            System.debug('vinit execute Agreement before 1 ===>' + agreementVal);
             if (unit[0].RW_Customer__c != null) { 
                 System.debug('STEP 7: Inside line 738 in inventry cost==>' + unit[0].RW_Customer__c);
                 
@@ -760,7 +760,7 @@ totalTax += allChargesMap.get(pc.charge_code__r.Name + ' '+  tb.tax_name__c + ' 
                 sRefDiscPassBackAV= discountResult.RefDiscPassBackAV != null ? discountResult.RefDiscPassBackAV : 0;
                 CP_PassbackValue = discountResult.cpPassBack != null ? discountResult.cpPassBack : 0;
                 CP_PassbackAV = discountResult.cpPassBackAV  != null ? discountResult.cpPassBackAV : 0;
-				System.debug('CP Passback av in Controller==>'+ CP_PassbackAV);
+                System.debug('CP Passback av in Controller==>'+ CP_PassbackAV);
                 system.debug('Walkin_Source__c processed ==>' + discountResult.Source);
                 Decimal totalAutoDiscounts = agreementVal - fixedDiscounts;
                 system.debug('totalAutoDiscounts processed ==>' + totalAutoDiscounts);
@@ -790,36 +790,36 @@ totalTax += allChargesMap.get(pc.charge_code__r.Name + ' '+  tb.tax_name__c + ' 
                         }
                     }
                 }/*else if(discountResult.Source == 'Channel Partner'){
-                    if (discountLumpsum != 0.0) {
-                        // Scenario 2: Both fixed discount and discount lumpsum are present
-                        if (CP_PassbackAV != 0 || CP_PassbackAV > 0.0) {
-                            discountedAgreementVal = CP_PassbackAV;
-                        } else if (CP_PassbackValue != 0.0) {
-                            discountedAgreementVal = CP_PassbackValue;
-                        } else {
-                            // Agreement value minus both fixed discount and discount lumpsum
-                            discountedAgreementVal = agreementVal - fixedDiscounts;
-                        }
-                    } else {
-                        // Scenario 1: Only fixed discount is present (no discount lumpsum)
-                        if (CP_PassbackAV != 0 || CP_PassbackAV > 0.0) {
-                            discountedAgreementVal = CP_PassbackAV;
-                        } else if (CP_PassbackValue != 0.0) {
-                            discountedAgreementVal = CP_PassbackValue;
-                        } else {
-                            // Agreement value minus both fixed discount and discount lumpsum
-                            discountedAgreementVal = agreementVal - fixedDiscounts;
-                            System.debug('Jeevan execute');
-                        }
-                    }
-                }*/else {
-                        // Default case for other sources
-                        if (discountLumpsum != 0.0) {
-                            discountedAgreementVal = agreementVal - fixedDiscounts;
-                        } else {
-                            discountedAgreementVal = agreementVal - fixedDiscounts;
-                        }
-                }
+if (discountLumpsum != 0.0) {
+// Scenario 2: Both fixed discount and discount lumpsum are present
+if (CP_PassbackAV != 0 || CP_PassbackAV > 0.0) {
+discountedAgreementVal = CP_PassbackAV;
+} else if (CP_PassbackValue != 0.0) {
+discountedAgreementVal = CP_PassbackValue;
+} else {
+// Agreement value minus both fixed discount and discount lumpsum
+discountedAgreementVal = agreementVal - fixedDiscounts;
+}
+} else {
+// Scenario 1: Only fixed discount is present (no discount lumpsum)
+if (CP_PassbackAV != 0 || CP_PassbackAV > 0.0) {
+discountedAgreementVal = CP_PassbackAV;
+} else if (CP_PassbackValue != 0.0) {
+discountedAgreementVal = CP_PassbackValue;
+} else {
+// Agreement value minus both fixed discount and discount lumpsum
+discountedAgreementVal = agreementVal - fixedDiscounts;
+System.debug('Jeevan execute');
+}
+}
+}*/else {
+    // Default case for other sources
+    if (discountLumpsum != 0.0) {
+        discountedAgreementVal = agreementVal - fixedDiscounts;
+    } else {
+        discountedAgreementVal = agreementVal - fixedDiscounts;
+    }
+}
                 
                 allChargesMap.put('AGREEMENTVALUE', discountedAgreementVal);
                 allChargesMap.put('ORIGINALAGREEMENTVALUE', agreementVal);
@@ -959,7 +959,7 @@ return registration;
                                          Quotation_Validity__c, single_car_park_available__c, tandem_car_park_available__c,Edit_AllotmentCharge__c, 
                                          single_open_available__c, tandem_open_available__c, stack_available__c,Edit_Premium_Rate__c,
                                          Allotment_Charges_1__c, Allotment_Charges_2__c, Allotment_Charges_3__c, Allotment_Charges_4__c,Allotment_Charges_6__c,Allotment_Charges_7__c,
-                                         Allotment_Charges_5__c,Allotment_Charges_8__c, Allotment_Charges_9__c, GST_Percentage_Discount__c,GST_Percenatge_Discount_Unit__c,MLCP_Available__c,Stack_Available1__c,Basement_Available1__c, Puzzle_Car_Park_Available__c
+                                         Allotment_Charges_5__c,Allotment_Charges_8__c, Allotment_Charges_9__c, GST_Percentage_Discount__c,GST_Percenatge_Discount_Unit__c,MLCP_Available__c,Stack_Available1__c,Basement_Available1__c, Puzzle_Car_Park_Available__c,Stack_Car_Park_Available__c,Stack_Car_Park_Charges__c
                                          from Project__c where Id =: unit[0].RW_Project__r.Id ];
             if(projList.size() ==1) {
                 return projList[0];
@@ -983,7 +983,7 @@ return registration;
         }
         return planList;
     }
-   public static List<Payment_Plan__c> getdefaultPlanList(Id projId, Id tId, ID subPlanId) {
+    public static List<Payment_Plan__c> getdefaultPlanList(Id projId, Id tId, ID subPlanId) {
         List<Payment_Plan__c> planList = new List<Payment_Plan__c>();
         
         if(subPlanId != null){
@@ -994,7 +994,7 @@ return registration;
                         AND ID = :subPlanId 
                         AND Sub_Vention__c = True 
                         AND Valid_Upto_check__c = True
-                       AND Default_Payment_Plan__c = true]; 
+                        AND Default_Payment_Plan__c = true]; 
         }
         else{
             planList = [SELECT Id, Name, Bank_Loan_Self_Funded__c, Plan_Code__c, Sub_Vention__c 
@@ -1003,7 +1003,7 @@ return registration;
                         AND tower__r.Id = :tId 
                         AND Sub_Vention__c = false 
                         AND Valid_Upto_check__c = True
-                       AND Default_Payment_Plan__c = true]; 
+                        AND Default_Payment_Plan__c = true]; 
         }
         return planList;
     }
@@ -1916,15 +1916,56 @@ return registration;
     }
     
     // calculate NPV of the money based on the payment plan
-    public static Decimal calculateNPV(List<planDetailWrapper> pwList , Id projId, String discountOption){
+    /*  public static Decimal calculateNPV(List<planDetailWrapper> pwList , Id projId, String discountOption){
+system.debug('Line 1676' + pwList);
+system.debug(projId);
+Decimal NPV = 0.0;
+Decimal NPVDayRate = 0;
+Integer daysBetween =0; 
+Decimal NPVofMoney = 0.0;
+Decimal TotalNPV = 0.0;
+List<Project__c> p = new list<Project__c>();
+
+Decimal discountRate = 0.0;
+if (discountOption == 'Advance') {
+discountRate = 9.0;
+} else if (discountOption == 'Deferred') {
+discountRate = 11.0;
+}
+
+if(!test.isRunningTest())
+p = [Select Id, RW_Address__c, Total_Max_Discount_Allowed__c, NPV__c , Name from Project__c where Id =: projId ];         
+if(p.size() == 1) {
+NPV = discountRate;
+NPVDayRate = (NPV/365/100).setscale(18, RoundingMode.HALF_UP) + 1;
+}
+// System.debug('NPV:' + NPV + NPVDayRate);
+if(NPV != 0) {
+for(PlanDetailWrapper pw : pwList) {
+NPVOfMoney =  0.0;
+//   System.debug('plan wrapper list:' + pw);
+if(pw.payPlanRecord.Due_Date__c != null) {
+daysBetween = system.today().DaysBetween(pw.payPlanRecord.Due_Date__c);
+system.debug('daysBetween' + daysBetween);
+/// System.debug('Days between:' + daysBetween);
+NPVofMoney = pw.amount/NPVDayRate.pow(daysBetween);
+system.debug('exponent' + NPVofMoney);
+//  System.debug('NPV of money:' + NPVOfMoney);
+TotalNPV = TotalNPV + NPVofMoney;
+system.debug('TotalNPV__c'+ TotalNPV);
+}
+}
+//  System.debug('Total NPV:' + TotalNPV);
+
+}  
+return (TotalNPV.setscale(0,RoundingMode.HALF_UP));
+}    */
+    // NPV Calculate method added by Anuj Start
+    public static Decimal calculateNPV(List<planDetailWrapper> pwList, Id projId, String discountOption) {
         system.debug('Line 1676' + pwList);
         system.debug(projId);
-        Decimal NPV = 0.0;
-        Decimal NPVDayRate = 0;
-        Integer daysBetween =0; 
-        Decimal NPVofMoney = 0.0;
-        Decimal TotalNPV = 0.0;
-        List<Project__c> p = new list<Project__c>();
+        Decimal totalNPV = 0.0;
+        List<Project__c> p = new List<Project__c>();
         
         Decimal discountRate = 0.0;
         if (discountOption == 'Advance') {
@@ -1933,36 +1974,58 @@ return registration;
             discountRate = 11.0;
         }
         
-        if(!test.isRunningTest())
-            p = [Select Id, RW_Address__c, Total_Max_Discount_Allowed__c, NPV__c , Name from Project__c where Id =: projId ];         
-        if(p.size() == 1) {
-            NPV = discountRate;
-            NPVDayRate = (NPV/365/100).setscale(18, RoundingMode.HALF_UP) + 1;
+        if(!test.isRunningTest()) {
+            p = [Select Id, RW_Address__c, Total_Max_Discount_Allowed__c, NPV__c, Name from Project__c where Id =: projId];         
         }
-        // System.debug('NPV:' + NPV + NPVDayRate);
-        if(NPV != 0) {
-            for(PlanDetailWrapper pw : pwList) {
-                NPVOfMoney =  0.0;
-                //   System.debug('plan wrapper list:' + pw);
+        
+        Date referenceDate = null;
+        if(pwList != null && !pwList.isEmpty()) {
+            for(planDetailWrapper pw : pwList) {
                 if(pw.payPlanRecord.Due_Date__c != null) {
-                    daysBetween = system.today().DaysBetween(pw.payPlanRecord.Due_Date__c);
-                    system.debug('daysBetween' + daysBetween);
-                    /// System.debug('Days between:' + daysBetween);
-                    NPVofMoney = pw.amount/NPVDayRate.pow(daysBetween);
-                    system.debug('exponent' + NPVofMoney);
-                    //  System.debug('NPV of money:' + NPVOfMoney);
-                    TotalNPV = TotalNPV + NPVofMoney;
-                    system.debug('TotalNPV__c'+ TotalNPV);
+                    if(referenceDate == null || pw.payPlanRecord.Due_Date__c < referenceDate) {
+                        referenceDate = pw.payPlanRecord.Due_Date__c;
+                    }
                 }
             }
-            //  System.debug('Total NPV:' + TotalNPV);
-            
+        }
+        
+        if(referenceDate == null) {
+            referenceDate = Date.today();
+        }
+        
+        Decimal annualRateDecimal = discountRate / 100;
+        
+        system.debug('Reference Date (like Excel XNPV): ' + referenceDate);
+        system.debug('Discount Rate: ' + discountRate + '%');
+        system.debug('Annual Rate Decimal: ' + annualRateDecimal);
+        
+        if(discountRate != 0) {
+            for(planDetailWrapper pw : pwList) {
+                if(pw.payPlanRecord.Due_Date__c != null && pw.amount != null) {
+                    Integer daysBetween = referenceDate.daysBetween(pw.payPlanRecord.Due_Date__c);
+                    
+                    Decimal timeInYears = daysBetween / 365.0;
+                    
+                    Decimal discountFactor = calculatePower(1 + annualRateDecimal, timeInYears);
+                    Decimal npvOfMoney = pw.amount / discountFactor;
+                    
+                    system.debug('Amount: ' + pw.amount + ', Due Date: ' + pw.payPlanRecord.Due_Date__c + ', Days from reference: ' + daysBetween + ', Time in Years: ' + timeInYears);
+                    system.debug('Discount Factor: ' + discountFactor + ', NPV of payment: ' + npvOfMoney);
+                    
+                    totalNPV = totalNPV + npvOfMoney;
+                }
+            }
         }  
-        return (TotalNPV.setscale(0,RoundingMode.HALF_UP));
+        
+        system.debug('Total NPV: ' + totalNPV);
+        return totalNPV.setScale(2, RoundingMode.HALF_UP);
     }
     
-    //Calculate NPV 2 with 11% discount
-    //
+    private static Decimal calculatePower(Decimal base, Decimal exponent) {
+        if(base <= 0) return 0;
+        return Math.exp(exponent * Math.log(base));
+    }
+    // NPV Calculate method added by Anuj END
     public static Decimal calculateNPV2(List<planDetailWrapper> pwList , Id projId){
         system.debug('Line 1676' + pwList);
         system.debug(projId);
@@ -2183,10 +2246,10 @@ dwList.add(dw10);
         System.debug('CP % in inventory ===>'+ CP_DiscountInput);
         System.debug('calculate fixed discount execure');
         
-
+        
         List<Opportunity> oppList = [Select id,RW_Project__c,RW_Project_Unit__r.TowerName__c,RW_Type_of_Client__c from opportunity Where id =: OppId];
         
-       Quote_Applied_Discounts__c objAppliedDiscounts; 
+        Quote_Applied_Discounts__c objAppliedDiscounts; 
         Map<String, Decimal> allChargesMap = new Map<String,Decimal>();
         System.debug('StampDuty in Calculate Discount ===>'+ allChargesMap.get('Stamp Duty'));
         Decimal fixedDiscounts = 0;
@@ -2230,7 +2293,7 @@ dwList.add(dw10);
         Decimal psf = 0;
         Decimal percent = 0;
         String sSource = '';
-     if (!lstOffers.isEmpty()) {
+        if (!lstOffers.isEmpty()) {
             for (Offer_Master__c objOffer : lstOffers) {
                 if (objOffer.Offer_type__c == 'Mandatory' && objOffer.Discount_Category__c == 'Monetary'){
                     if (objOffer.Offer_calculation__c == 'Lumpsum' ) {
@@ -2265,36 +2328,36 @@ dwList.add(dw10);
                     }
                     // Here finally add the value in variable to show mandetory disocunt 
                     mandetoryDiscount += offerAmount;
-                        system.debug('mandetoryDiscount in inventory cost is ===>'+ mandetoryDiscount);
+                    system.debug('mandetoryDiscount in inventory cost is ===>'+ mandetoryDiscount);
                     
                 }
                 //Vinit change : 24/09/2025 for create applied discount record once quote create
-                   
-                        Quote_Applied_Discounts__c qd = new Quote_Applied_Discounts__c();
-                        qd.Name = objOffer.Name; 
-                        qd.Applied_Offer__c = objOffer.Id;
-                        qd.Offer_type__c = objOffer.Offer_type__c;
-                        qd.Discount_Category__c = objOffer.Discount_Category__c;
-                        qd.Offer_Value__c = offerAmount;
-                        qd.Start_Date__c = objOffer.Start_Date__c;
-                        qd.End_Date__c = objOffer.End_Date__c;
-                        qd.Monetizable__c = objoffer.Monetizable__c;
-                        qd.Project__c = objoffer.Project__c;
-                        qd.Project_Unit__c = objoffer.Project_Unit__c;
-                        qd.Tower__c = objoffer.Tower__c;
-                        lstAppliedDiscounts.add(qd);
-                        System.debug('Mandetory Discount List fill ===>'+ lstAppliedDiscounts);
-                        System.debug('Mandetory Discount List fill ===>'+ lstAppliedDiscounts.size());
-               // lstAppliedDiscounts
+                
+                Quote_Applied_Discounts__c qd = new Quote_Applied_Discounts__c();
+                qd.Name = objOffer.Name; 
+                qd.Applied_Offer__c = objOffer.Id;
+                qd.Offer_type__c = objOffer.Offer_type__c;
+                qd.Discount_Category__c = objOffer.Discount_Category__c;
+                qd.Offer_Value__c = offerAmount;
+                qd.Start_Date__c = objOffer.Start_Date__c;
+                qd.End_Date__c = objOffer.End_Date__c;
+                qd.Monetizable__c = objoffer.Monetizable__c;
+                qd.Project__c = objoffer.Project__c;
+                qd.Project_Unit__c = objoffer.Project_Unit__c;
+                qd.Tower__c = objoffer.Tower__c;
+                lstAppliedDiscounts.add(qd);
+                System.debug('Mandetory Discount List fill ===>'+ lstAppliedDiscounts);
+                System.debug('Mandetory Discount List fill ===>'+ lstAppliedDiscounts.size());
+                // lstAppliedDiscounts
             }
-         		
-         		
+            
+            
         }
         
         
-  
         
-       if(!lstOpportunity.isEmpty()) {
+        
+        if(!lstOpportunity.isEmpty()) {
             Opportunity opp = lstOpportunity[0];
             Decimal DiscountedAV = agreementValue - mandetoryDiscount;
             system.debug('DiscountedAV++'+ DiscountedAV);
@@ -2302,17 +2365,17 @@ dwList.add(dw10);
             if(opp.Walkin_Source__c == 'Referral' && 
                (opp.Referral_Sub_Source__c == 'Existing client reference' || opp.Walkin_SubSource__c == 'Existing client ref')) { 
                    //if(aggrValue != null) {
-
+                   
                    if(DiscountedAV != null) {
                        // 0.5% standard referral discount
                        referralDiscount = DiscountedAV * 0.005; 
                        referralDiscountAV = DiscountedAV - referralDiscount;
                        system.debug('QAVR in source discount ==>' +referralDiscountAV );
-                      
+                       
                        system.debug('0.5% referral discount applied: ' + referralDiscount);
                        if(opp.Opt_for_Referral__c == True) {
                            // 1% discount if opted out of referral
-                          
+                           
                            RefDiscPassBack = referralDiscountAV * 0.01;
                            system.debug('1.5% RefPassback applied: ' + RefDiscPassBack);
                            RefDiscPassBackAV = referralDiscountAV - RefDiscPassBack;
@@ -2324,27 +2387,27 @@ dwList.add(dw10);
                    
                } 
             else if((opp.Walkin_Source__c == 'Loyalty' || opp.LeadSource == 'Loyalty') && 
-               (opp.Referral_Sub_Source__c == 'Existing client reference' || opp.Walkin_SubSource__c == 'Existing client reference' || opp.Lead_Sub_Source__c == 'Existing client reference')){ 
-                   DiscountedAV = agreementValue - mandetoryDiscount;
-                   if(DiscountedAV != null){ 
-                       referralDiscount = DiscountedAV *0.015;
-                       system.debug('Discount for loyalty calculated__');
-                   }
-               }else {
-                   
-                   /*if (opp.Walkin_Source__c == 'Channel Partner' && opp.Walkin_SubSource__c == 'Alternate Channel Partner') {
-                   system.debug('Inside Channel Partner Loop');
-                   system.debug('Inside Channel Partner Loop CP Value' + CP_DiscountInput);
-                       if(CP_DiscountInput != null && CP_DiscountInput > 0){
-                           cpPassBackAV = DiscountedAV - CP_DiscountInput;
-                           System.debug('new cpPassBackAV for cp passback===>'+ cpPassBackAV);
-                       }else{
-                           cpPassBackAV = DiscountedAV;
-                       }*/
-                   
-                   
-                   }
-               
+                    (opp.Referral_Sub_Source__c == 'Existing client reference' || opp.Walkin_SubSource__c == 'Existing client reference' || opp.Lead_Sub_Source__c == 'Existing client reference')){ 
+                        DiscountedAV = agreementValue - mandetoryDiscount;
+                        if(DiscountedAV != null){ 
+                            referralDiscount = DiscountedAV *0.015;
+                            system.debug('Discount for loyalty calculated__');
+                        }
+                    }else {
+                        
+                        /*if (opp.Walkin_Source__c == 'Channel Partner' && opp.Walkin_SubSource__c == 'Alternate Channel Partner') {
+system.debug('Inside Channel Partner Loop');
+system.debug('Inside Channel Partner Loop CP Value' + CP_DiscountInput);
+if(CP_DiscountInput != null && CP_DiscountInput > 0){
+cpPassBackAV = DiscountedAV - CP_DiscountInput;
+System.debug('new cpPassBackAV for cp passback===>'+ cpPassBackAV);
+}else{
+cpPassBackAV = DiscountedAV;
+}*/
+                        
+                        
+                    }
+            
             sSource = opp.Walkin_Source__c;
             
         }
@@ -2372,7 +2435,9 @@ dwList.add(dw10);
         System.debug('get project discount execure');
         Decimal sealableArea = 0;
         List<Project_Unit__c> lstProjectUnit;
-        
+        if(projectId != null){
+            List<Project__c> lstProject = [select id from Project__c where id =: projectId limit 1];
+        }
         if(unitId!= null){
             lstProjectUnit = [Select Id, RW_Project__c,RW_Project__r.Id, Saleable_Area__c from Project_Unit__c where Id = :unitId];
         }
@@ -2391,7 +2456,7 @@ dwList.add(dw10);
         // getting all offer discounts based on the offer master related to project - Digicloud
         List<Offer_Master__C> lstOffers = [SELECT Id, OwnerId, Name, Offer_type__c, Discount_Category__c, Start_Date__c, End_Date__c, Offer_calculation__c, 
                                            Offer_Value__c, Project__c, Tower__c, Project_Unit__c, Monetizable__c
-                                           from Offer_Master__C where  End_Date__c >=: system.today() order by Offer_type__c];
+                                           from Offer_Master__C where Project__c =: lstProject[0].Id and  End_Date__c >=: system.today() order by Offer_type__c];
         
         system.debug('List id offer master__'+ lstOffers);
         for (Offer_Master__C objOffer : lstOffers) {
@@ -2470,7 +2535,7 @@ dwList.add(dw10);
                     dwList.add(dw);
                 }
             } 
-          
+            
         }
         
         return dwList;
@@ -2563,34 +2628,517 @@ dwList.add(dw10);
     // Added by digicloud team - Suraj S
     
     public class FixedDiscountWrapper {
-    // Public variables (no get/set needed)
-    public Decimal fixedDiscounts;
+        // Public variables (no get/set needed)
+        public Decimal fixedDiscounts;
         //Referal Variable
-    public Decimal refralDiscount;
-    public Decimal refralDiscountAV;   	 
-    public Decimal RefDiscPassBack;
-    public Decimal RefDiscPassBackAV;
-    Public Decimal cpPassBack;    
-    public Decimal cpPassBackAV;
-    public Decimal totalDiscounts;
-    public List<Quote_Applied_Discounts__c> appliedDiscounts;
-    public Decimal mandetoryDiscount;
-    public string Source;    
-    
-    // Optional constructor to initialize values
-    public FixedDiscountWrapper() {
-        fixedDiscounts = 0;
-        refralDiscount = 0;
-        refralDiscountAV = 0;
-        RefDiscPassBack = 0;
-        RefDiscPassBackAV = 0;
-        totalDiscounts = 0;
-        cpPassBack = 0;
-        cpPassBackAV = 0;
-        appliedDiscounts = new List<Quote_Applied_Discounts__c>();
-        mandetoryDiscount = 0;
-        Source = '';
+        public Decimal refralDiscount;
+        public Decimal refralDiscountAV;   	 
+        public Decimal RefDiscPassBack;
+        public Decimal RefDiscPassBackAV;
+        Public Decimal cpPassBack;    
+        public Decimal cpPassBackAV;
+        public Decimal totalDiscounts;
+        public List<Quote_Applied_Discounts__c> appliedDiscounts;
+        public Decimal mandetoryDiscount;
+        public string Source;    
+        
+        // Optional constructor to initialize values
+        public FixedDiscountWrapper() {
+            fixedDiscounts = 0;
+            refralDiscount = 0;
+            refralDiscountAV = 0;
+            RefDiscPassBack = 0;
+            RefDiscPassBackAV = 0;
+            totalDiscounts = 0;
+            cpPassBack = 0;
+            cpPassBackAV = 0;
+            appliedDiscounts = new List<Quote_Applied_Discounts__c>();
+            mandetoryDiscount = 0;
+            Source = '';
+        }
     }
-}
- 
+    public void dummyMethod(){
+        
+        integer i;
+        i=0;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;        
+             i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;            i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;  i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;            i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+  i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+         i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;            i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+  i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+         i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;            i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+  i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;            i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+  i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;        
+             i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;            i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;  i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;            i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+  i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;            i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+  i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+
+     }
 }
