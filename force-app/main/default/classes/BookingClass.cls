@@ -269,6 +269,7 @@ public with sharing class BookingClass {
     List < Car_Parking_Charge__c > BasementParkingList = new List < Car_Parking_Charge__c > ();
     List < Car_Parking_Charge__c > PodiumParkingList = new List < Car_Parking_Charge__c > ();
     List < Car_Parking_Charge__c > PuzzleCarParkList = new List < Car_Parking_Charge__c > (); //Added by Vinay 28-03-2025
+    List < Car_Parking_Charge__c > StackCarParkList = new List < Car_Parking_Charge__c > (); //Added by Vinay 19-11-2025
     
     List < Applicant_Details__c > listApplicant = new list < Applicant_Details__c > ();
     List < Receipt_Details__c > listReceiptDetails = new list < Receipt_Details__c > (); 
@@ -345,6 +346,7 @@ set;
         BasementParkingList = new List < Car_Parking_Charge__c > ();
         PodiumParkingList = new List < Car_Parking_Charge__c > ();
         PuzzleCarParkList = new List < Car_Parking_Charge__c > (); //Added by Vinay 28-03-2025
+        StackCarParkList = new List < Car_Parking_Charge__c > (); //Added by Vinay 19-11-2025
         
         ReceiptLstTobeUpdate = new List < Receipt__c > ();
         
@@ -396,20 +398,43 @@ set;
         if (ApexPages.currentPage().getParameters().get('unitId') != null && ApexPages.currentPage().getParameters().get('unitId') != '') {
             
             unitId = ApexPages.currentPage().getParameters().get('unitId');
-            system.debug('inside contructor unit is ' + unitId);
+            //system.debug('inside contructor unit is ' + unitId);
         }
         
         
         
         if (ApexPages.currentPage().getParameters().get('optyid') != null && ApexPages.currentPage().getParameters().get('optyid') != '') {
             boookingObj.Opportunity__c = ApexPages.currentPage().getParameters().get('optyid');
-            
-            Opportunity opp = [SELECT Id, RW_Type_of_Client__c, AccountId FROM Opportunity WHERE Id =: ApexPages.currentPage().getParameters().get('optyid')]; //Commented by Vinay 04-06-2025
-            
+            // Added For Unidentified Payment RW_Project_Unit__r.Token_Amount__c,RW_Project_Unit__c,RW_Project__c,RW_Project__r.Token_Amount__c
+            Opportunity opp = [SELECT Id, RW_Type_of_Client__c, AccountId,RW_Project_Unit__r.Token_Amount__c,RW_Project_Unit__c,RW_Project__c,RW_Project__r.Token_Amount__c FROM Opportunity WHERE Id =: ApexPages.currentPage().getParameters().get('optyid')]; //Commented by Vinay 04-06-2025
+            // Added For Unidentified Payment End
             acc = [SELECT Id, Salutation, FirstName, LastName, RW_Zip_Code__c, RW_Company_Name__c, RW_Other_Company_Name__c, RW_Designation__c, No_of_family_members__c, RW_Occupation__c, Distance_To_Office__c, Family_Income__c, Purpose__c, Vehicles_owned__c, Industry, Current_Residential_Address__c, Four_Wheeler__c FROM Account WHERE Id =: opp.AccountId]; //Added by Vinay 03-06-2025
             if(opp.RW_Type_of_Client__c == null && !Test.isRunningTest()){
                 throw new CommonException('Type of Client should not be blank.');
             }
+            // Added For Unidentified Payment Start
+            if(opp!=null && (opp.RW_Project_Unit__c!=null && opp.RW_Project_Unit__r.Token_Amount__c!=null) || (opp.RW_Project__c!=null && opp.RW_Project__r.Token_Amount__c!=null)){
+                Decimal requiredToken = 0;
+                if(opp.RW_Project_Unit__c!=null && opp.RW_Project_Unit__r.Token_Amount__c!=null){
+                    requiredToken = opp.RW_Project_Unit__r.Token_Amount__c;
+                }
+                else if(opp.RW_Project__c!=null && opp.RW_Project__r.Token_Amount__c!=null){
+                    requiredToken = opp.RW_Project__r.Token_Amount__c;
+                }
+                AggregateResult[] results = [SELECT SUM(Total_Amount_Paid__c) total 
+                                             FROM RW_Payment_Details__c 
+                                             WHERE Opportunity__c = :opp.Id and Status__c!='Reversed'];
+                Decimal totalPaid = 0;
+                if (results.size() > 0 && results[0].get('total') != null) {
+                    totalPaid = (Decimal)results[0].get('total');
+                }
+                if (totalPaid < requiredToken) {
+                    
+                    throw new CommonException('Booking cannot be created : Token SAP receipt not received! Required: '+ requiredToken + ', Received: ' + totalPaid);
+                }
+            }
+            
+            // Added For Unidentified Payment End
             
             try {
                 ReceiptDetails = [SELECT id, Project_Unit__c, Project__c, Name, Cheque_DD_Date__c, DraweeBank__c, CreatedDate, LastModifiedDate, Token_Amount_Receipt__c, Due_Amount_Rs__c, Mode__c, Branch__c, Total_Amount__c,
@@ -465,10 +490,11 @@ set;
         // Added by UBSDigicloud  Start------------------------------- Date 19-06-2025
         List<Blocking_Unit_Information__c> blkUnitInfoList = [
             SELECT Id, 
-            Amount__c, Amount_2__c, Amount_3__c, Amount_4__c, Amount_5__c, Bank_Name__c, Bank_Name_2__c, Bank_Name_3__c, Bank_Name_4__c, Bank_Name_5__c,
+            Amount__c, Amount_2__c, Amount_3__c, Amount_4__c, Amount_5__c,
             Mode_Of_Payment__c, Mode_Of_Payment_2__c, Mode_Of_Payment_3__c, Mode_Of_Payment_4__c, Mode_Of_Payment_5__c,
             Paid_Date__c, Paid_Date_2__c, Paid_Date_3__c, Paid_Date_4__c, Paid_Date_5__c,
-            Transaction_Details__c, Transaction_Details_2__c, Transaction_Details_3__c, Transaction_Details_4__c, Transaction_Details_5__c,Pan_Number__c,Aadhar_Number__c
+            Transaction_Details__c, Transaction_Details_2__c, Transaction_Details_3__c, Transaction_Details_4__c, Transaction_Details_5__c,Pan_Number__c,Aadhar_Number__c,
+            /*Added for unidentified payments starts*/ Bank_Name__c,Bank_Name_2__c,Bank_Name_3__c,Bank_Name_4__c,Bank_Name_5__c /*Added for unidentified payments ends*/
             FROM Blocking_Unit_Information__c 
             WHERE Opportunity__c = :boookingObj.Opportunity__c AND Active__c = true
         ];
@@ -498,38 +524,38 @@ set;
                 String mode;
                 Date datePaid;
                 String txn;
-                String bank; //Added by Vinay 22-08-2025
+                String bank;//Added for unidentified payments
                 
                 if (i == 0) {
                     amount = blk.Amount__c;
                     mode = blk.Mode_Of_Payment__c;
                     datePaid = blk.Paid_Date__c;
                     txn = blk.Transaction_Details__c;
-                    bank = blk.Bank_Name__c; //Added by Vinay 22-08-2025
+                    bank = blk.Bank_Name__c;//Added for unidentified payments
                 } else if (i == 1) {
                     amount = blk.Amount_2__c;
                     mode = blk.Mode_Of_Payment_2__c;
                     datePaid = blk.Paid_Date_2__c;
                     txn = blk.Transaction_Details_2__c;
-                    bank = blk.Bank_Name_2__c; //Added by Vinay 22-08-2025
+                    bank = blk.Bank_Name_2__c;//Added for unidentified payments
                 } else if (i == 2) {
                     amount = blk.Amount_3__c;
                     mode = blk.Mode_Of_Payment_3__c;
                     datePaid = blk.Paid_Date_3__c;
                     txn = blk.Transaction_Details_3__c;
-                    bank = blk.Bank_Name_3__c; //Added by Vinay 22-08-2025
+                    bank = blk.Bank_Name_3__c;//Added for unidentified payments
                 } else if (i == 3) {
                     amount = blk.Amount_4__c;
                     mode = blk.Mode_Of_Payment_4__c;
                     datePaid = blk.Paid_Date_4__c;
                     txn = blk.Transaction_Details_4__c;
-                    bank = blk.Bank_Name_4__c; //Added by Vinay 22-08-2025
+                    bank = blk.Bank_Name_4__c;//Added for unidentified payments
                 } else if (i == 4) {
                     amount = blk.Amount_5__c;
                     mode = blk.Mode_Of_Payment_5__c;
                     datePaid = blk.Paid_Date_5__c;
                     txn = blk.Transaction_Details_5__c;
-                    bank = blk.Bank_Name_5__c; //Added by Vinay 22-08-2025
+                    bank = blk.Bank_Name_5__c;//Added for unidentified payments
                 }
                 
                 // Only add the row if at least one meaningful value exists
@@ -539,7 +565,8 @@ set;
                     r.Mode__c = mode;
                     r.Cheque_DD_Date__c = datePaid;
                     r.Cheque_DD__c = txn;
-                    r.DraweeBank__c = bank; //Added by Vinay 22-08-2025
+                    r.DraweeBank__c=bank;//Added for unidentified payments
+                    
                     tempList.add(r);
                 }
             }
@@ -600,7 +627,7 @@ set;
                     ApexPages.Message myMsg = new ApexPages.Message(ApexPages.Severity.Error, 'Temp Channel Partner should be converted before creation of Booking');
                     ApexPages.addMessage(myMsg);
                     i = 1;
-                }*/
+                }*///COmmented by Prashant to Allow temp cps to Book now. //15-9-25.
                 //Added by coServe 11-04-2024 End
                 if(optyList[0].RW_Type_of_Client__c != Null){
                     boookingObj.Type_of_Client__c = optyList[0].RW_Type_of_Client__c;
@@ -618,8 +645,25 @@ set;
                 }
                 
                 if(optyList[0].RW_Project__c != NULL){
-                    boookingObj.CP_Invoice_Clearing_L1__c = optyList[0].RW_Project__r.CP_Invoice_Clearing_L1__c;
-                    boookingObj.CP_Invoice_Clearing_L2__c = optyList[0].RW_Project__r.CP_Invoice_Clearing_L2__c;
+                    Set<Id> projectIds = new Set<Id>{ optyList[0].RW_Project__c};
+
+                    Map<Id, List<Team_Members__c>> approvers =BatchforAOPSchemeTagging.getProjectTeamMembers(projectIds, 'CP Approvers Team', new List<String>{ 'CP Invoice Clearing L1', 'CP Invoice Clearing L2' });
+                    List<Team_Members__c> tmList = approvers.get(optyList[0].RW_Project__c);
+
+                    if (tmList != null) {
+                        for (Team_Members__c tm : tmList) {
+
+                            if (tm.Approver_Type__c == 'CP Invoice Clearing L1') {
+                                boookingObj.CP_Invoice_Clearing_L1__c = tm.User__c;
+                            }
+
+                            if (tm.Approver_Type__c == 'CP Invoice Clearing L2') {
+                                boookingObj.CP_Invoice_Clearing_L2__c = tm.User__c;
+                            }
+                        }
+                    }
+                    // boookingObj.CP_Invoice_Clearing_L1__c = optyList[0].RW_Project__r.CP_Invoice_Clearing_L1__c;
+                    // boookingObj.CP_Invoice_Clearing_L2__c = optyList[0].RW_Project__r.CP_Invoice_Clearing_L2__c;
                 }
                 /* if(optyList[0].RW_Project_Unit__r.name != Null){
 boookingObj.Tower__c = optyList[0].RW_Project_Unit__r.TowerName__c;
@@ -749,8 +793,8 @@ boookingObj.Sub_Source__c = optyList[0].Walkin_SubSource__c;
             }
         }
         if (boookingObj.Opportunity__c != null && unitId == null && ProjectId == null) {
-            system.debug('get quote if only opty');
-            queryResult = [SELECT id, Tandem_car_park_Additional__c,Stack_Additional__c,MLCP_Additional__c, Single_car_park_Additional__c,Podium__c, Name, Booking__c, Allow_booking_without_full_token__c, Project_Unit__r.RW_Project__c, Service_Tax_On_Token_Amount__c, Quote_Status__c,Puzzle_Car_Park__c
+            //system.debug('get quote if only opty');
+            queryResult = [SELECT id, Tandem_car_park_Additional__c,Stack_Additional__c,MLCP_Additional__c, Single_car_park_Additional__c,Podium__c, Name, Booking__c, Allow_booking_without_full_token__c, Project_Unit__r.RW_Project__c, Service_Tax_On_Token_Amount__c, Quote_Status__c,Puzzle_Car_Park__c,Stack_Additional_1__c
                            from Quotation__c where Quote_Status__c = 'Valid' and Opportunity__c =: boookingObj.Opportunity__c and Project_Unit__r.RW_Project__c =: optyList[0].RW_Project__c and Project_Unit__r.RW_Unit_Status__c = 'Vacant'
                            and Booking__c =: null
                           ];
@@ -758,30 +802,32 @@ boookingObj.Sub_Source__c = optyList[0].Walkin_SubSource__c;
                 system.debug('Result only opty quotations' + queryResult);
                 
             } else {
-                system.debug('Quotation Else if only opty');
+               // system.debug('Quotation Else if only opty');
                 ApexPages.Message myMsg = new ApexPages.Message(ApexPages.Severity.Error, 'Either this opportunity does not have a Valid Quotation or the unit associated with it is not vacant');
                 ApexPages.addMessage(myMsg);
             }
             
-        } else if (boookingObj.Opportunity__c != null && unitId != null && ProjectId == null) {
-            queryResult = [SELECT id, Tandem_car_park_Additional__c,Podium__c,Stack_Additional__c,MLCP_Additional__c, Single_car_park_Additional__c, Name, Booking__c, Allow_booking_without_full_token__c, Service_Tax_On_Token_Amount__c, Project_Unit__r.RW_Project__c, Project_Unit__c,Quote_Status__c, Puzzle_Car_Park__c from Quotation__c where Quote_Status__c = 'Valid' and Opportunity__c =: boookingObj.Opportunity__c and Project_Unit__c =: unitId and Project_Unit__r.RW_Project__c =: optyList[0].RW_Project__c and(Project_Unit__r.RW_Unit_Status__c = 'Available'
+        } 
+        else if (boookingObj.Opportunity__c != null && unitId != null && ProjectId == null) {
+            queryResult = [SELECT id, Tandem_car_park_Additional__c,Podium__c,Stack_Additional__c,MLCP_Additional__c, Single_car_park_Additional__c, Name, Booking__c, Allow_booking_without_full_token__c, Service_Tax_On_Token_Amount__c, Project_Unit__r.RW_Project__c, Project_Unit__c,Quote_Status__c, Puzzle_Car_Park__c,Stack_Additional_1__c from Quotation__c where Quote_Status__c = 'Valid' and Opportunity__c =: boookingObj.Opportunity__c and Project_Unit__c =: unitId and Project_Unit__r.RW_Project__c =: optyList[0].RW_Project__c and(Project_Unit__r.RW_Unit_Status__c = 'Available'
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    OR Project_Unit__r.RW_Unit_Status__c = 'Blocked') and Booking__c =: null];
             system.debug('queryResult2' + queryResult);
             if (queryResult.size() > 0) {
                 system.debug('Result only opty and unit quotations' + queryResult);
             } else {
-                system.debug('Quotation Else if opty  and unit is present but no quotation');
+                //system.debug('Quotation Else if opty  and unit is present but no quotation');
                 ApexPages.Message myMsg = new ApexPages.Message(ApexPages.Severity.Error, 'Either this opportunity does not have a Valid Quotation or the unit associated with the quotation is not vacant');
                 ApexPages.addMessage(myMsg);
                 i = 1;
             }
             
-        } else if (boookingObj.Opportunity__c != null && ProjectId != null && unitId == null) {
+        } 
+        else if (boookingObj.Opportunity__c != null && ProjectId != null && unitId == null) {
             system.debug('get quote if ProjectId  is not null and ProjectId  :-' + ProjectId);
-            queryResult = [SELECT id, Tandem_car_park_Additional__c,Stack_Additional__c,MLCP_Additional__c, Single_car_park_Additional__c,Podium__c, Name, Booking__c, Allow_booking_without_full_token__c, Project_Unit__r.RW_Project__c, Service_Tax_On_Token_Amount__c, Project_Unit__c,Quote_Status__c, Puzzle_Car_Park__c from Quotation__c where Quote_Status__c = 'Valid' and Opportunity__c =: boookingObj.Opportunity__c and Project__c =: ProjectId and Project_Unit__r.RW_Unit_Status__c = 'Available'
+            queryResult = [SELECT id, Tandem_car_park_Additional__c,Stack_Additional__c,MLCP_Additional__c, Single_car_park_Additional__c,Podium__c, Name, Booking__c, Allow_booking_without_full_token__c, Project_Unit__r.RW_Project__c, Service_Tax_On_Token_Amount__c, Project_Unit__c,Quote_Status__c, Puzzle_Car_Park__c,Stack_Additional_1__c from Quotation__c where Quote_Status__c = 'Valid' and Opportunity__c =: boookingObj.Opportunity__c and Project__c =: ProjectId and Project_Unit__r.RW_Unit_Status__c = 'Available'
                            and Booking__c =: null
                           ];
-            system.debug('queryResult' + queryResult);
+            //system.debug('queryResult' + queryResult);
             
             if (queryResult.size() > 0) {
                 system.debug('Result only opty and ProjectId quotations' + queryResult);
@@ -809,9 +855,8 @@ i = 1;
 
 } */
         else if (boookingObj.Opportunity__c != null && ProjectId != null && unitId != null) {
-            system.debug('get quote if ProjectId  is not null and ProjectId  :-' + ProjectId);
-            system.debug('get quote if opty and unitId ' + unitId);
-            queryResult = [SELECT id, Tandem_car_park_Additional__c,MLCP_Additional__c,Stack_Additional__c, Single_car_park_Additional__c,Podium__c, Name, Booking__c, Allow_booking_without_full_token__c, Project_Unit__r.RW_Project__c, Service_Tax_On_Token_Amount__c, Project_Unit__c,Quote_Status__c from Quotation__c where Quote_Status__c = 'Valid' and Opportunity__c =: boookingObj.Opportunity__c and Project__c =: ProjectId and(Project_Unit__r.RW_Unit_Status__c = 'Available'
+            system.debug('get quote if ProjectId  is not null and ProjectId  :-' + ProjectId + 'get quote if opty and unitId ' + unitId);
+            queryResult = [SELECT id, Tandem_car_park_Additional__c,MLCP_Additional__c,Stack_Additional__c, Single_car_park_Additional__c,Stack_Additional_1__c,Podium__c, Name, Booking__c, Allow_booking_without_full_token__c, Project_Unit__r.RW_Project__c, Service_Tax_On_Token_Amount__c, Project_Unit__c,Quote_Status__c from Quotation__c where Quote_Status__c = 'Valid' and Opportunity__c =: boookingObj.Opportunity__c and Project__c =: ProjectId and(Project_Unit__r.RW_Unit_Status__c = 'Available'
                                                                                                                                                                                                                                                                                                                                                                                                                                               OR Project_Unit__r.RW_Unit_Status__c = 'Hold' OR Project_Unit__r.RW_Unit_Status__c = 'Blocked') and Project_Unit__c =: unitId and Booking__c =: null];
             system.debug('queryResult' + queryResult);
         }
@@ -826,7 +871,7 @@ i = 1;
     public List < SelectOption > getQuote {
         get {
             
-            system.debug('Inside getQuote queryResult' + queryResult);
+            //system.debug('Inside getQuote queryResult' + queryResult);
             List < SelectOption > optns = new List < Selectoption > ();
             optns.add(new SelectOption('', 'Select a Quotation'));
             if (queryResult.size() > 0) {
@@ -856,28 +901,25 @@ i = 1;
         system.debug('receiptlist inside method size::::' + receiptlist.size());
         
         rowIndex = Integer.valueOf(ApexPages.currentPage().getParameters().get('rowIndex'));
-        System.debug('row index be deleted ' + rowIndex);
-        System.debug('rows to be deleted ' + receiptlist[rowIndex]);
+        System.debug('row index be deleted ' + rowIndex + 'rows to be deleted ' + receiptlist[rowIndex]);
         del = receiptlist.remove(rowIndex);
         deletereceiptlist.add(del);
     }
     
     //Get Token from Quotation
     public PageReference getTokenAmount() {
-        system.debug('Selected Val' + selectedQuote);
+        //system.debug('Selected Val' + selectedQuote);
         if (selectedQuote != null) {
-            QuoteDetails = [SELECT id, Tandem_car_park_Additional__c,MLCP_Additional__c, Single_car_park_Additional__c,Podium__c, Tandem_Open_Additional__c, Single_Open_Additional__c, Stack_Additional__c,Basement_Additional__c, Name, Booking__c, Allow_booking_without_full_token__c, Agreement_Value__c, Carpet_Area_Sq_Ft__c, Appartment_Configuration__c, Project__c
-                            
-                            , Service_Tax_On_Token_Amount__c,
+            QuoteDetails = [SELECT id, Tandem_car_park_Additional__c,MLCP_Additional__c, Single_car_park_Additional__c,Stack_Additional_1__c,Podium__c, Tandem_Open_Additional__c, Single_Open_Additional__c, Stack_Additional__c,Basement_Additional__c, Name, Booking__c, Allow_booking_without_full_token__c, Agreement_Value__c, Carpet_Area_Sq_Ft__c, Appartment_Configuration__c, Project__c, Service_Tax_On_Token_Amount__c,
                             Project_Unit__c, Token_Amount__c, ST_Token_Amount__c, Zone__c, Wing__c, Flat_Typology__c, FloorNo__c, Carpet_Area__c, No_of_parking__c, Parking_Type__c,Project__r.CEO__c, Puzzle_Car_Park__c,Stamp_duty_payable_by_Runwal__c,
                             Allotment_Premium_Agreement_Value__c, Agreement_Value_D__c, FlatNo__c, Level_One_Approver__c, Level_Two_Approver__c, Level_Three_Approver__c,Discount_9_Type__c,Discount_9_L__c, Quote_Status__c,Project_Unit__r.TowerName__c,Agreement_Value_for_brokers__c,Brokerage_Agreement_Value__c,Discount_10_Type__c,Discount_10_L__c,Discount_11_L__c,Discount_11_Type__c,Is_Special_Brokerage_Scheme__c,walkin_Source__c,Total_Car_Park_Amount__c,
-                            Project_Unit__r.Token_Amount__c, Project_Unit__r.RW_Project__r.Token_Amount__c
+                            Project_Unit__r.Token_Amount__c, Project_Unit__r.RW_Project__r.Token_Amount__c,/*Added by Prashant to add map development charges with booking.19-11-25...*/Development_Charges_L__c
                             FROM Quotation__c WHERE Id =: selectedQuote
                            ];
             
             //System.debug('Inside unitdetails'+unitDetails);
             if (QuoteDetails.size() > 0) {
-                System.Debug('Inside QuoteDetails' + QuoteDetails);
+                //System.Debug('Inside QuoteDetails' + QuoteDetails);
                 boookingObj.Token_Amount__c = QuoteDetails[0].Token_Amount__c;
                 //Anuja added on 29/12/15
                 tokenamt = QuotationManagementServices1.INFormat(QuoteDetails[0].Token_Amount__c);
@@ -889,6 +931,9 @@ i = 1;
                 boookingObj.No_of_parking__c = QuoteDetails[0].No_of_parking__c;
                 boookingObj.Parking_Type__c = QuoteDetails[0].Parking_Type__c;
                 boookingObj.Is_Special_Brokerage_Scheme__c =  QuoteDetails[0].Is_Special_Brokerage_Scheme__c;   //Added by Sheetal on 03/03/2023
+                if(QuoteDetails[0].Development_Charges_L__c != null && QuoteDetails[0].Development_Charges_L__c != 0)
+                	boookingObj.Development_Charge__c = QuoteDetails[0].Development_Charges_L__c; /*Added by Prashant to add map development charges with booking.19-11-25...*/
+                	system.debug('Inside Development chargs- > '+boookingObj.Development_Charge__c);
                 
                 if(QuoteDetails[0].Project_Unit__c  != Null){			//Added by Sheetal
                     boookingObj.Tower__c = QuoteDetails[0].Project_Unit__r.TowerName__c;
@@ -902,12 +947,11 @@ i = 1;
                 
                 if(AopList.size() >0 && !AopList.isEmpty()){
                     system.debug('Inside if AopList ::::');
-                    if(QuoteDetails[0].Quote_Status__c == 'Valid' && QuoteDetails[0].Discount_9_L__c == Null){
-                        system.debug('Inside if  ::::'); 
+                    if(QuoteDetails[0].Quote_Status__c == 'Valid' && (QuoteDetails[0].Discount_9_L__c == Null || QuoteDetails[0].Discount_9_L__c == 0)){
+                        //system.debug('Inside if  ::::'); 
                         boookingObj.Is_AOP_CP_Applicable__c = true;
-                        system.debug('Aop Applicable ::' +boookingObj.Is_AOP_CP_Applicable__c);
                         boookingObj.AOP_Scheme__c = AopList[0].id;
-                        system.debug('Aop Scheme ::'+boookingObj.AOP_Scheme__c );
+                        system.debug('Aop Applicable ::' +boookingObj.Is_AOP_CP_Applicable__c + 'Aop Scheme ::'+boookingObj.AOP_Scheme__c );
                         
                     }
                 }
@@ -932,7 +976,7 @@ boookingObj.Is_AOP_CP_Applicable__c = true;
                 if(QuoteDetails[0].Project__r.CEO__c != null){
                     boookingObj.CEO__c = QuoteDetails[0].Project__r.CEO__c;
                 }
-                System.Debug('Milestone1');
+                //System.Debug('Milestone1');
                 boookingObj.Level_One_Approver__c = QuoteDetails[0].Level_One_Approver__c;
                 boookingObj.Level_Two_Approver__c = QuoteDetails[0].Level_Two_Approver__c;
                 boookingObj.Level_Three_Approver__c = QuoteDetails[0].Level_Three_Approver__c;
@@ -943,13 +987,14 @@ boookingObj.Is_AOP_CP_Applicable__c = true;
                     //Anuja added on 29/12/15
                     STamt = QuotationManagementServices1.INFormat(QuoteDetails[0].ST_Token_Amount__c);
                 } else {
+                    
                     boookingObj.ST_Token_Amount__c = 0;
                 }
                 unitDetails = [SELECT id,Booking__c,Is_Booking_tagged__c FROM Project_Unit__c WHERE id =: QuoteDetails[0].Project_Unit__c];
                 
                 if (boookingObj.Opportunity__c != null && QuoteDetails[0].Project_Unit__c != null) {
                     le = QuotationManagementServices1.getLegalEntityDetails(boookingObj.Unit_No__c, boookingObj.Project__c);
-                    System.debug('leeeeeeee ' + le);
+                    //System.debug('leeeeeeee ' + le);
                     if (le != null) {
                         boookingObj.Stock__c = le.Account_Name_Flat_Cost__c;
                         boookingObj.Account_Number__c = String.valueOf(le.Account_Number_Flat_Cost__c);
@@ -1072,6 +1117,16 @@ boookingObj.Is_AOP_CP_Applicable__c = true;
                     
                 }
                 
+                if (QuoteDetails[0].Stack_Additional_1__c != null) { //Added by Vinay 19-11-2025
+                    StackCarParkList = [Select id, Parking__c, Category__c, Status__c, Name, Booking__c From Car_Parking_Charge__c where Parking__c =: 'Stack'
+                                         and Status__c =: 'Vacant'
+                                         and Category__c =: 'Additional'
+                                         and Project__c =: boookingObj.Project__c
+                                        ];
+                    System.debug('StackCarPark Size ..........)  ' + StackCarParkList.size());
+                    
+                }
+                
             }
             if (!Test.isRunningTest())
                 getReceiptDetails();
@@ -1085,13 +1140,13 @@ boookingObj.Is_AOP_CP_Applicable__c = true;
     public PageReference getReceiptDetails() {
         TotalReceiptAmount = 0;
         STTotalReceiptAmount = 0;
-        system.debug('inside getReceiptDetails');
+        //system.debug('inside getReceiptDetails');
         try {
             ReceiptDetails = [SELECT id, Project_Unit__c, Project__c, Name, Cheque_DD_Date__c, DraweeBank__c, CreatedDate, LastModifiedDate, Token_Amount_Receipt__c, Due_Amount_Rs__c, Mode__c, Branch__c, Total_Amount__c,
                               Receipt_Date__c FROM Receipt__c WHERE Opportunity__c =: boookingObj.Opportunity__c and Token_Amount_Receipt__c = true And(Project_Unit__c = null OR Project_Unit__c =: unitId)
                              ]; //and Token_Amount_Receipt__c = true 
             if (ReceiptDetails.size() > 0) {
-                system.debug('Inside ReceiptDetails outside constructor');
+                //system.debug('Inside ReceiptDetails outside constructor');
                 boookingObj.Booking_Date__c = ReceiptDetails[0].CreatedDate;
                 boookingObj.Receipts__c = ReceiptDetails[0].id;
                 for (Receipt__c rds: ReceiptDetails) {
@@ -1111,7 +1166,7 @@ boookingObj.Booking_Date__c = System.Now();
                                     Receipt_Date__c FROM Receipt__c WHERE Opportunity__c =: boookingObj.Opportunity__c and Token_Amount_ST__c = true And(Project_Unit__c = null OR Project_Unit__c =: unitId)
                                    ];
                 if (STReceiptDetails.size() > 0) {
-                    system.debug('Inside STReceiptDetails outside constructor');
+                    //system.debug('Inside STReceiptDetails outside constructor');
                     boookingObj.ServiceReceipt__c = STReceiptDetails[0].id;
                     for (Receipt__c strds: STReceiptDetails) {
                         STTotalReceiptAmount = STTotalReceiptAmount + strds.Total_Amount__c;
@@ -1132,7 +1187,7 @@ boookingObj.Booking_Date__c = System.Now();
     
     public PageReference getaddressstatus() {
         
-        System.Debug('inside' + addressCheck);
+        //System.Debug('inside' + addressCheck);
         
         if (addressCheck == true) {
             addressCheckReverse = false;
@@ -1144,7 +1199,6 @@ boookingObj.Booking_Date__c = System.Now();
     }
     
     public PageReference Save() {
-        
         
         TotalServiceandToken = 0;
         i = 0;
@@ -1208,7 +1262,7 @@ boookingObj.Booking_Date__c = System.Now();
         
         //Basement -- Added by Payal 27/07/2021 ///
         if (QuoteDetails != null && QuoteDetails.size() > 0 && BasementParkingList .size() < QuoteDetails[0].Basement_Additional__c) {
-            system.debug('BasementParkingList error');
+            //system.debug('BasementParkingList error');
             ApexPages.Message myMsg = new ApexPages.Message(ApexPages.Severity.Error, 'Required number of Basement parking is unavailable');
             ApexPages.addMessage(myMsg);
             i = 1;
@@ -1229,6 +1283,16 @@ boookingObj.Booking_Date__c = System.Now();
         if (QuoteDetails != null && QuoteDetails.size() > 0 && PuzzleCarParkList.size() < QuoteDetails[0].Puzzle_Car_Park__c) {
             system.debug('PuzzleCarParkList error');
             ApexPages.Message myMsg = new ApexPages.Message(ApexPages.Severity.Error, 'Required number of Puzzle Car parking is unavailable');
+            ApexPages.addMessage(myMsg);
+            i = 1;
+            System.debug('--i: ' + i);
+            
+        }
+        
+        //Stack Car Park -- Added by Vinay 19-11-2025
+        if (QuoteDetails != null && QuoteDetails.size() > 0 && StackCarParkList.size() < QuoteDetails[0].Stack_Additional_1__c) {
+            system.debug('StackCarParkList error');
+            ApexPages.Message myMsg = new ApexPages.Message(ApexPages.Severity.Error, 'Required number of Stack Car parking is unavailable');
             ApexPages.addMessage(myMsg);
             i = 1;
             System.debug('--i: ' + i);
@@ -1835,8 +1899,8 @@ System.debug('--i: ' + i);
                 
             }
             if (applicant2.Subtype_Of_Applicant__c == 'For NRI') {
-                if (applicant2.Pancard__c == false /*|| applicant2.One_Passport_Size_Color_Photograph__c == false*/ || applicant2.PassportNumber__c == false || applicant2.Funds_from_NRE_NRO__c == false || applicant2.Copy_of_Workpermit_Employment_contract__c == false   /*|| String.isBlank(applicant2.Address_Proof_Number__c)*/
-                    || String.isBlank(applicant2.PancardNo__c)) {
+                //if (applicant2.Pancard__c == false /*|| applicant2.One_Passport_Size_Color_Photograph__c == false*/ || applicant2.PassportNumber__c == false || applicant2.Funds_from_NRE_NRO__c == false || applicant2.Copy_of_Workpermit_Employment_contract__c == false   || String.isBlank(applicant2.Address_Proof_Number__c) || String.isBlank(applicant2.PancardNo__c)) { //Commented by Vinay 21-08-2025. There is deifference in the condition compared to applicant 1 & applicant 3 conditions.
+                 if (applicant2.Pancard__c == false /*|| applicant2.One_Passport_Size_Color_Photograph__c == false*/ || applicant2.PassportNumber__c == false || applicant2.Funds_from_NRE_NRO__c == false || applicant2.Copy_of_Workpermit_Employment_contract__c == false) {
                         ApexPages.Message myMsg = new ApexPages.Message(ApexPages.Severity.Error, 'Please ensure that all the document checkboxes are checked and document details are filled properly.');
                         ApexPages.addMessage(myMsg);
                         i = 1;
@@ -1874,6 +1938,7 @@ System.debug('--i: ' + i);
                     ApexPages.Message myMsg = new ApexPages.Message(ApexPages.Severity.Error, 'Pancard for Applicant 2 Should Be Of 10 Digits');
                     ApexPages.addMessage(myMsg);
                     i = 1;
+                    System.debug('--i: ' + i);
                 }
             }
             //anuja added on 16 dec  
@@ -1883,22 +1948,26 @@ System.debug('--i: ' + i);
                     ApexPages.Message myMsg = new ApexPages.Message(ApexPages.Severity.Error, 'Mailing address Line1 for Applicant 2 Cannot Be Left Blank');
                     ApexPages.addMessage(myMsg);
                     i = 1;
+                    //System.debug('--i: ' + i);
                 }
                 if (applicant2.Mailing_Pincode__c == null) {
                     ApexPages.Message myMsg = new ApexPages.Message(ApexPages.Severity.Error, 'Mailing  Pincode for Applicant 2 Cannot Be Left Blank');
                     ApexPages.addMessage(myMsg);
                     i = 1;
+                    //System.debug('--i: ' + i);
                 }
                 if (applicant2.Mailing_Country__c == null) {
                     ApexPages.Message myMsg = new ApexPages.Message(ApexPages.Severity.Error, 'Mailing  Country for Applicant 2 Cannot Be Left Blank');
                     ApexPages.addMessage(myMsg);
                     i = 1;
+                    //System.debug('--i: ' + i);
                 }
                 if (applicant2.Mailing_Country__c == 'India' && applicant2.Mailing_Pincode__c != null) {
                     if (String.valueOf(applicant2.Mailing_Pincode__c).length() != 6) {
                         ApexPages.Message myMsg = new ApexPages.Message(ApexPages.Severity.Error, 'Mailing Pincode for Applicant 2 Should Be Of 6 Digits');
                         ApexPages.addMessage(myMsg);
                         i = 1;
+                        //System.debug('--i: ' + i);
                     }
                 }
                 if (applicant2.Mailing_Country__c == 'India') {
@@ -1906,12 +1975,14 @@ System.debug('--i: ' + i);
                         ApexPages.Message myMsg = new ApexPages.Message(ApexPages.Severity.Error, 'Mailing State for Applicant 2 Cannot Be Left Blank');
                         ApexPages.addMessage(myMsg);
                         i = 1;
+                        //System.debug('--i: ' + i);
                     }
                 }
                 if (applicant2.Mailing_City__c == null) {
                     ApexPages.Message myMsg = new ApexPages.Message(ApexPages.Severity.Error, 'Mailing City for Applicant 2 Cannot Be Left Blank');
                     ApexPages.addMessage(myMsg);
                     i = 1;
+                    //System.debug('--i: ' + i);
                 }
             }
         }
@@ -2603,9 +2674,9 @@ System.debug('--i: ' + i);
         //Added by Prashant to prioritize the schemes that will be tagged on booking which has tower in it.//END - 13-01-25
         if(!sc.isEmpty()){
             system.debug('sc ----->>>> '+sc);
-            if(QuoteDetails[0].walkin_Source__c == 'Channel Partner'){
+            if(QuoteDetails[0].walkin_Source__c == 'Channel Partner' || QuoteDetails[0].walkin_Source__c == 'Temp Channel Partner'){
                 system.debug('Inside Booking date >= scheme start date');
-                brokerageScheme = [select Id,Name,Base_Brokerage__c,Base_Brokerage_for_OS_NRI__c,Type__c,Base_Brokerage_for_Local_Bookings__c from Brokerage_Scheme__c where id =: sc[0].Brokerage_Scheme__c and
+                brokerageScheme = [select Id,Name,Base_Brokerage__c,Base_Brokerage_for_OS_NRI__c,Type__c,Base_Brokerage_for_Local_Bookings__c,Base_Brokerage_for_NRI__c from Brokerage_Scheme__c where id =: sc[0].Brokerage_Scheme__c and
                                    Start_Date__c <=: bookingDate and (End_Date__c = null or End_Date__c >=: bookingDate) and Approval_Status__c = 'Approved by Level 2'];
                 
                 system.debug('brokerageScheme::'+brokerageScheme);
@@ -2635,9 +2706,9 @@ System.debug('--i: ' + i);
             } 
             system.debug('sc ----->>>> '+sc);
             if(!sc.isEmpty()){
-                if(QuoteDetails[0].walkin_Source__c == 'Channel Partner'){
+                if(QuoteDetails[0].walkin_Source__c == 'Channel Partner' || QuoteDetails[0].walkin_Source__c == 'Temp Channel Partner'){
                     system.debug('Inside Booking date <= scheme start date');
-                    brokerageScheme = [select Id,Name,Base_Brokerage__c,Base_Brokerage_for_OS_NRI__c,Type__c,Base_Brokerage_for_Local_Bookings__c from Brokerage_Scheme__c where id =: sc[0].Brokerage_Scheme__c and
+                    brokerageScheme = [select Id,Name,Base_Brokerage__c,Base_Brokerage_for_OS_NRI__c,Type__c,Base_Brokerage_for_Local_Bookings__c,Base_Brokerage_for_NRI__c from Brokerage_Scheme__c where id =: sc[0].Brokerage_Scheme__c and
                                        Approval_Status__c = 'Approved by Level 2'];
                     system.debug('brokerageScheme::'+brokerageScheme);
                 }
@@ -2647,7 +2718,7 @@ System.debug('--i: ' + i);
         system.debug('Scheme configuration ----->>>> '+sc);
         system.debug('Brokerage scheme ----->>>> '+brokerageScheme);
         
-        /*   if(QuoteDetails != null && !QuoteDetails.isEmpty() && QuoteDetails[0].walkin_Source__c == 'Channel Partner'){
+     /*   if(QuoteDetails != null && !QuoteDetails.isEmpty() && QuoteDetails[0].walkin_Source__c == 'Channel Partner'){
 
 //Added by Prashant to compress code for this cls. // START 9-7-25
 
@@ -2656,14 +2727,10 @@ system.debug('Base Brokerage Before -->>'+boookingObj.Base_Brokerage__c);
 boookingObj = BookingClass2.updateBrokerageSchemeDetails(boookingObj, QuoteDetails, brokerageScheme, bookingDate, bookingDate2);
 
 system.debug('Base Brokerage After -->>'+boookingObj.Base_Brokerage__c);*/
+
+//Added by Prashant to compress code for this cls. // END 9-7-25
         
-        //Added by Prashant to compress code for this cls. // END 9-7-25
-        
-        
-        
-        
-        
-        if(QuoteDetails != null && !QuoteDetails.isEmpty() &&  QuoteDetails[0].walkin_Source__c == 'Channel Partner' ){
+       /*  if(QuoteDetails != null && !QuoteDetails.isEmpty() &&  (QuoteDetails[0].walkin_Source__c == 'Channel Partner' || QuoteDetails[0].walkin_Source__c == 'Temp Channel Partner') ){
             
             // if(QuoteDetails[0].Agreement_Value_for_brokers__c != 0 || QuoteDetails[0].Agreement_Value_for_brokers__c != Null)
             
@@ -2734,40 +2801,55 @@ system.debug('Base Brokerage After -->>'+boookingObj.Base_Brokerage__c);*/
                 boookingObj.Brokerage__c = brokerageScheme[0].Base_Brokerage_for_Local_Bookings__c - (((boookingObj.Passback_Amount__c / QuoteDetails[0].Brokerage_Agreement_Value__c)*100 ).setscale(2,RoundingMode.HALF_UP));
                 
             }
-        } 
+        } */
         //Added by Prashant to tag the scheme based on the booking date. END 9-4-25////
         //
         
+        
+        //Added by Prashant to update logic to add scheme brokerage based on type of client - 22-10-25. START///////
+        system.debug('Base Brokerage Before -->>'+boookingObj.Base_Brokerage__c);
+        boookingObj = BookingClass2.updateBrokerageSchemeDetails(boookingObj, QuoteDetails, brokerageScheme);
+        system.debug('Base Brokerage After -->>'+boookingObj.Base_Brokerage__c);
+        //Added by Prashant to update logic to add scheme brokerage based on type of client - 22-10-25. END///////
+        
+        
         //////////////////////////////////////Added BY Aniket Ends Here on 29-09-2022////////////////////////////////////////
         //////////////////////////////////////Receipt Mandatory Checks//////////////////////////////////////////
-        
-        ReceiptLstTobeUpdate.clear(); //Added by Vinay 20-08-2025
+        system.debug('ReceiptDetails.size():::: ' + ReceiptDetails.size());
         if (ReceiptDetails.size() == 0 && STReceiptDetails.size()==0) {
+            System.Debug('insert receipt ' + ReceiptObj);
+            System.Debug('receiptlist.size() ' + receiptlist.size());
             
-            List<String> utrDetails = new List<String>(); //Added by Vinay 21-08-2025
+            
+            System.Debug('--receiptlist :' + receiptlist);
             for(Receipt__c rce : receiptlist)
             {
+                system.debug('inside for loop');
                 if (rce.Mode__c== null) //
                 {
                     
                     ApexPages.Message myMsg = new ApexPages.Message(ApexPages.Severity.Error, 'Instrument Of Receipt Cannot Be Left Blank');
                     ApexPages.addMessage(myMsg);
                     i = 1;
+                    System.debug('--i: ' + i);
                 }
                 if (rce.Cheque_DD__c== null) {
                     ApexPages.Message myMsg = new ApexPages.Message(ApexPages.Severity.Error, 'Instrument number Cannot Be Left Blank');
                     ApexPages.addMessage(myMsg);
                     i = 1;
+                    System.debug('--i: ' + i);
                 }
                 if (rce.Cheque_DD_Date__c == null) {
                     ApexPages.Message myMsg = new ApexPages.Message(ApexPages.Severity.Error, 'Date Of Receipt Cannot Be Left Blank');
                     ApexPages.addMessage(myMsg);
                     i = 1;
+                    System.debug('--i: ' + i);
                 }
                 if (rce.Total_Amount__c == null) {
                     ApexPages.Message myMsg = new ApexPages.Message(ApexPages.Severity.Error, 'Amount Of Receipt Cannot Be Left Blank');
                     ApexPages.addMessage(myMsg);
                     i = 1;
+                    System.debug('--i: ' + i);
                 }
                 else{
                     //TotalReceiptAmount = receiptlist[0].Total_Amount__c;
@@ -2777,21 +2859,13 @@ system.debug('Base Brokerage After -->>'+boookingObj.Base_Brokerage__c);*/
                     ApexPages.Message myMsg = new ApexPages.Message(ApexPages.Severity.Error, 'Bank Of Receipt Cannot Be Left Blank');
                     ApexPages.addMessage(myMsg);
                     i = 1;
+                    System.debug('--i: ' + i);
                 }
                 
                 
-                if(!String.isBlank(rce.DraweeBank__c) && !String.isBlank(rce.Cheque_DD__c)){ //Added by Vinay 21-08-2025
-                    utrDetails.add(rce.Cheque_DD__c + '_' + rce.DraweeBank__c);
-                }
             }
             
-            Set<String> uniqueUtrDetails = new Set<String>(utrDetails);  //Added by Vinay 21-08-2025
-            if (utrDetails.size() > 1 && utrDetails.size() > uniqueUtrDetails.size()) {  //Added by Vinay 21-08-2025
-                ApexPages.Message myMsg = new ApexPages.Message(ApexPages.Severity.ERROR, 'Duplicate Cheque / UTR Details found');
-                ApexPages.addMessage(myMsg); 
-                i = 1;
-            }
-            
+            System.debug('Step oneeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee');
             //Checking token amount for all //
             Map < String, Decimal > taxSlabMap = QuotationManagementServices1.getTaxSlabs();
             Decimal TDSAmount = 0;
@@ -2799,6 +2873,7 @@ system.debug('Base Brokerage After -->>'+boookingObj.Base_Brokerage__c);*/
                 
                 TDSAMount = ((taxSlabMap.get('TDS') * boookingObj.Token_Amount__c) / 100).setscale(0, RoundingMode.HALF_UP);
             }
+            System.debug('TDS Amount:' + TDSAmount + 'on token Amount:' + boookingObj.Token_Amount__c);
             if (boookingObj.Token_Amount__c != null && boookingObj.ST_Token_Amount__c != null) {
                 TotalQuoteToken = boookingObj.ST_Token_Amount__c + (boookingObj.Token_Amount__c - TDSAmount);
                 TotalToken = TotalServiceandToken;
@@ -2882,14 +2957,13 @@ and Project__c =: boookingObj.Project__c LIMIT 1
 ];
 System.Debug('listglobalcharges' + listglobalcharges);*/
         //inserting the receipt
+        System.debug('iiiiiiiiiiiiiiiiiii TOKEN ' + i);
         boookingObj.Quotation__c = selectedQuote;
         
         //added by shailesh
         if (i == 0  || Test.isRunningTest()) {
-            Decimal totalAmount = 0; //Added by Vinay 05-08-2025
-            System.debug('ReceiptLstTobeUpdate: ' + ReceiptLstTobeUpdate.size());
+            Decimal totalAmount = 0; //Added by Vinay 14-08-2025
             for (Receipt__c ListRct: receiptlist) {
-                System.debug('ListRct.Cheque_DD__c: ' + ListRct.Cheque_DD__c);
                 Receipt__c receiptOBJTobeUpdate = new Receipt__c();
                 receiptOBJTobeUpdate.Mode__c = ListRct.Mode__c;
                 receiptOBJTobeUpdate.Cheque_DD__c = ListRct.Cheque_DD__c;
@@ -2908,9 +2982,13 @@ System.Debug('listglobalcharges' + listglobalcharges);*/
                 receiptOBJTobeUpdate.On_Account_Money__c = ListRct.Total_Amount__c;
                 receiptOBJTobeUpdate.Amount_Rs__c = ListRct.Total_Amount__c;
                 receiptOBJTobeUpdate.Opportunity_Email_Id__c = applicant.Email_Address__c;
+                /*Added for unidentified payments starts*/
+                receiptOBJTobeUpdate.Receipt_Unique_Key__c = ListRct.Cheque_DD__c +'_'+ ListRct.DraweeBank__c;
+                receiptOBJTobeUpdate.Active__c = true;
+                /*Added for unidentified payments ends*/
                 
-                totalAmount += (ListRct.Total_Amount__c != null)? ListRct.Total_Amount__c : 0; //Added by Vinay 05-08-2025
-                
+                totalAmount += (ListRct.Total_Amount__c != null)? ListRct.Total_Amount__c : 0; //Added by Vinay 14-08-2025
+ 
                 if (ListRct.Token_Amount_ST__c == True) {
                     //system.debug('inside service tax true' + receiptlist[i].Id);
                     receiptOBJTobeUpdate.Token_Amount_Receipt__c = False;
@@ -2924,24 +3002,32 @@ System.Debug('listglobalcharges' + listglobalcharges);*/
                 if (receiptOBJTobeUpdate.Total_Amount__c != null && receiptOBJTobeUpdate.Mode__c != null)
                     ReceiptLstTobeUpdate.add(receiptOBJTobeUpdate);
             }
-            
-            
-            if (QuoteDetails != null && QuoteDetails.size() > 0) {
-                Decimal requiredTokenAmount = QuoteDetails[0].Project_Unit__r.Token_Amount__c != null 
-                    ? QuoteDetails[0].Project_Unit__r.Token_Amount__c 
-                    : QuoteDetails[0].Project_Unit__r.RW_Project__r.Token_Amount__c; //Added by Vinay 05-08-2025
-                if(totalAmount < requiredTokenAmount){ //Added by Vinay 05-08-2025
-                    ApexPages.Message myMsg = new ApexPages.Message(ApexPages.Severity.Error, 'Total Amount is less than the Token Amount, you cannot book this unit.  Token Amount is:'+requiredTokenAmount);
-                    ApexPages.addMessage(myMsg); 
-                    i = 1;
-                    return null;
-                } 
-            } 
+
+            Decimal requiredTokenAmount = QuoteDetails[0].Project_Unit__r.Token_Amount__c != null ? QuoteDetails[0].Project_Unit__r.Token_Amount__c : QuoteDetails[0].Project_Unit__r.RW_Project__r.Token_Amount__c; //Added by Vinay 14-08-2025
+            if(totalAmount < requiredTokenAmount){ //Added by Vinay 14-08-2025
+                ApexPages.Message myMsg = new ApexPages.Message(ApexPages.Severity.Error, 'Total Amount is less than the Token Amount, you cannot book this unit.  Token Amount is:'+requiredTokenAmount);
+                ApexPages.addMessage(myMsg); 
+                i = 1;
+                return null;
+            }
             
             try {
-                if (!ReceiptLstTobeUpdate.isEmpty()) {
-                    insert ReceiptLstTobeUpdate;
-                }
+                    // Set<String> uniqueKeys = new Set<String>();
+                    // List<Receipt__c> receiptToUpsert = new List<Receipt__c>();
+
+                    // for (Receipt__c r : ReceiptLstTobeUpdate) {
+                    //     if (!uniqueKeys.contains(r.Receipt_Unique_Key__c)) {
+                    //         uniqueKeys.add(r.Receipt_Unique_Key__c);
+                    //         receiptToUpsert.add(r);
+                    //     }
+                    // }
+                    // if (!receiptToUpsert.isEmpty()) {
+                    //insert ReceiptLstTobeUpdate;
+                    //upsert receiptToUpsert Receipt_Unique_Key__c;//Added for unidentified payments
+                    if (!ReceiptLstTobeUpdate.isEmpty()) {
+                     upsert ReceiptLstTobeUpdate Receipt_Unique_Key__c;
+                    }
+                
             } catch (DmlException e) {
                 System.debug('An error has occured. Please contact your administrator. : ' + e.getMessage());
                 
@@ -3086,11 +3172,23 @@ System.Debug('listglobalcharges' + listglobalcharges);*/
             
             if (QuoteDetails != null && !QuoteDetails.isEmpty() && QuoteDetails[0].Puzzle_Car_Park__c> 0) { //Added by Vinay 28-03-2025
                 system.debug('PuzzleCarParkList Requires');
-                for (integer j = 0; j < QuoteDetails[0].Podium__c; j++) {
+                for (integer j = 0; j < QuoteDetails[0].Puzzle_Car_Park__c; j++) {
                     PuzzleCarParkList[j].Status__c = 'Booked';
                     if (boookingObj.Id != null)
                         PuzzleCarParkList[j].Booking__c = boookingObj.Id;
                     ParkingListToUpdate.add(PuzzleCarParkList[j]);
+                    
+                }
+                
+            }
+            
+            if (QuoteDetails != null && !QuoteDetails.isEmpty() && QuoteDetails[0].Stack_Additional_1__c> 0) { //Added by Vinay 19-11-2025
+                system.debug('StackCarParkList Requires');
+                for (integer j = 0; j < QuoteDetails[0].Stack_Additional_1__c; j++) {
+                    StackCarParkList[j].Status__c = 'Booked';
+                    if (boookingObj.Id != null)
+                        StackCarParkList[j].Booking__c = boookingObj.Id;
+                    ParkingListToUpdate.add(StackCarParkList[j]);
                     
                 }
                 
@@ -3102,7 +3200,7 @@ System.Debug('listglobalcharges' + listglobalcharges);*/
             //Updating  Customer Pay Plan Headers with new booking 
             if (boookingObj.id != null) {
                 try {
-                    
+                   
                     if (boookingObj.Quotation__c != null) {
                         CPPHList = [
                             SELECT Id, Name, Booking__c, Customer__c, Quotation__c 
@@ -3577,6 +3675,6 @@ return null;
 }
 //Added by coServe 23-03-2023 End*/
     
-    
+  
     
 }

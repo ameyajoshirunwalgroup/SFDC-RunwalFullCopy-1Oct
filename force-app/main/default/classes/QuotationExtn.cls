@@ -1,6 +1,7 @@
 public with sharing class QuotationExtn
 {
     public Decimal cNPVLoss { get; set; }
+     public Decimal Testtotalvalue { get; set; }
     public String selectedValue { get; set; }
     public List<SelectOption> discountOptions { get; set; }
     public String selectedDiscountOption { get; set; }
@@ -103,6 +104,7 @@ public with sharing class QuotationExtn
     public boolean  canAddCarPark7 {get;set;}
     public boolean  canAddCarPark8 {get;set;}
     public boolean  canAddCarPark9 {get;set;} //Added by Vinay 28-03-2025
+    public boolean  canAddCarPark10 {get;set;} //Added by Vinay 19-11-2025
     public boolean  showAddCarPark {get;set;} 
     public Integer selectedCarPark1 {get;set;}
     public Integer selectedCarPark2 {get;set;}
@@ -113,6 +115,7 @@ public with sharing class QuotationExtn
     public Integer selectedCarPark7 {get;set;}
     public Integer selectedCarPark8 {get;set;}
     public Integer selectedCarPark9 {get;set;} //Added by Vinay 28-03-2025
+    public Integer selectedCarPark10 {get;set;} //Added by Vinay 19-11-2025
  	public Decimal OriginalPlanNPVDeafult {get;set;}
     public Decimal fixedDiscount{get;set;}//Added by Digicloud
     public String SfixedDiscount{get;set;}//Added by Digicloud
@@ -190,6 +193,7 @@ public with sharing class QuotationExtn
         selectedCarPark7 = 0;
         selectedCarPark8 = 0;
         selectedCarPark9 = 0; //Added by Vinay 28-03-2025
+        selectedCarPark10 = 0; //Added by Vinay 19-11-2025
         allotmentCharges = 0;
         baseRate = 0;
         discountVal = 0;
@@ -300,15 +304,16 @@ public with sharing class QuotationExtn
             q.Opportunity__c = o.Id;
             //Added by Prashant to populate discount 10 and 11 in quote.//Start 29-07-2025.
            
-          /*  if(discountLumpsum > 0){
-                DiscountedAV = originalAgreementVal - (fixedDiscount + discountLumpsum);
+          /*if(discountLumpsum > 0){
+                DiscountedAV = agreementValue - discountLumpsum;
                 QuotedOfferValue = QuotationManagementServices.INFormat(DiscountedAV);
             }else{
-                 DiscountedAV = originalAgreementVal - fixedDiscount;
+                 DiscountedAV = agreementValue;
             }
             QuotedOfferValue = QuotationManagementServices.INFormat(DiscountedAV);*/
         }
-        
+        QuotedOfferValue = QuotationManagementServices.INFormat(agreementValue);
+        system.debug('QuotedOfferValue=='+QuotedOfferValue);
         discountPSF = 0;
         discountLumpsum = 0;
         editSchedule = false;
@@ -339,6 +344,7 @@ public with sharing class QuotationExtn
         selectedCarPark7 = 0;
         selectedCarPark8 = 0;
         selectedCarPark9 = 0; //Added by Vinay 28-03-2025
+        selectedCarPark10 = 0; //Added by Vinay 19-11-2025
         if(proj != null) {
             checkCarParkAvailablity();
             quoteValidity = (System.today().addDays(Integer.valueOf(proj.Quotation_Validity__c))).format();
@@ -459,8 +465,13 @@ proj.Basement_Available__c = basementAvailable.size();*/
         else 
             canAddCarPark9 = false;
         
+        if(proj.Stack_Car_Park_Available__c != null && proj.Stack_Car_Park_Available__c > 0)  //Added by Vinay 19-11-2025
+            canAddCarPark10 = true;
+        else 
+            canAddCarPark10 = false;
         
-        if(canAddCarPark1 || canAddCarPark2 || canAddCarPark3 || canAddCarPark4 || canAddCarPark5 || canAddCarPark6 || canAddCarPark7 || canAddCarPark8 || canAddCarPark9 )
+        
+        if(canAddCarPark1 || canAddCarPark2 || canAddCarPark3 || canAddCarPark4 || canAddCarPark5 || canAddCarPark6 || canAddCarPark7 || canAddCarPark8 || canAddCarPark9 || canAddCarPark10)
             showAddCarPark = true;
         else
             showAddCarPark = false;
@@ -478,6 +489,7 @@ proj.Basement_Available__c = basementAvailable.size();*/
         selectedCarPark7 = 0;
         selectedCarPark8 = 0;
         selectedCarPark9 = 0; //Added by Vinay 28-03-2025
+        selectedCarPark10 = 0; //Added by Vinay 19-11-2025
         Decimal carParkAmount1 = 0;
         Decimal carParkAmount2 = 0;
         Decimal carParkAmount3 = 0;
@@ -487,6 +499,7 @@ proj.Basement_Available__c = basementAvailable.size();*/
         Decimal carParkAmount7 = 0;
         Decimal carParkAmount8 = 0;
         Decimal carParkAmount9 = 0; //Added by Vinay 28-03-2025
+        Decimal carParkAmount10 = 0; //Added by Vinay 19-11-2025
         
         
         if(q.Single_car_park_additional__c  > proj.Single_car_park_available__c) {
@@ -528,6 +541,10 @@ proj.Basement_Available__c = basementAvailable.size();*/
         if(q.Puzzle_Car_Park__c > proj.Puzzle_Car_Park_Available__c) { //Added by Vinay 28-03-2025
             ApexPages.addmessage(new ApexPages.message(ApexPages.severity.FATAL,'selected quantity of Puzzle Car Parks not available'));
             q.Puzzle_Car_Park__c = 0;
+        }
+        if(q.Stack_Additional_1__c > proj.Stack_Car_Park_Available__c) { //Added by Vinay 19-11-2025
+            ApexPages.addmessage(new ApexPages.message(ApexPages.severity.FATAL,'selected quantity of Stack Car Parks not available'));
+            q.Stack_Additional_1__c = 0;
         }
         
         
@@ -592,8 +609,15 @@ proj.Basement_Available__c = basementAvailable.size();*/
             selectedCarPark9 = Integer.valueOf(q.Puzzle_Car_Park__c);
         }
         
+        if(q.Stack_Additional_1__c> 0) { //Added by Vinay 19-11-2025
+            carParkAmount10 = proj.Stack_Car_Park_Charges__c * q.Stack_Additional_1__c;
+            System.debug('carParkAmount10: ' + carParkAmount10);
+            q.Stack_Additional_Amount__c = carParkAmount10;
+            selectedCarPark10 = Integer.valueOf(q.Stack_Additional_1__c);
+        }
         
-        totalAmount = carParkAmount1 + carParkAmount2 + carParkAmount3 + carParkAmount4 + carParkAmount5 + carParkAmount6 + carParkAmount7 + carParkAmount8 + carParkAmount9;
+        
+        totalAmount = carParkAmount1 + carParkAmount2 + carParkAmount3 + carParkAmount4 + carParkAmount5 + carParkAmount6 + carParkAmount7 + carParkAmount8 + carParkAmount9 + carParkAmount10;
         
         allotmentCharges = totalAmount;
         InventoryCostServices.baseRateVal = baseRate;
@@ -604,7 +628,7 @@ proj.Basement_Available__c = basementAvailable.size();*/
         agreementValue = allChargesMap.get('AGREEMENTVALUE');
         StotalRateCardPSF = QuotationManagementServices.INFormat(allChargesMap.get('TOTALRATECARDPSF'));
         StotalRateCardLumspum = QuotationManagementServices.INFormat(allChargesMap.get('TOTALRATECARDLUMPSUM'));
-        
+		QuotedOfferValue = QuotationManagementServices.INFormat(agreementValue);        
         /* if(subPlanId != null) {
 Apexpages.currentPage().getParameters().put('subPlanId',subPlanId);
 QueryPlanDetails();
@@ -933,19 +957,26 @@ QueryPlanDetails();
     // method for final save of the payment changes 
     // here we disable discounts as discounts cant be applied after editing the payment plan
     // action related to button, Save Changes
-    public PageReference savePaymentSchedule() {
+   /* public PageReference savePaymentSchedule() {
         System.debug('NPV Loss ===>'+ NPVDiffLumpsum_Loss);
         System.debug('Allotment Charges ===>'+ allotmentCharges);
         System.debug('Discount Charges ===>'+ discountLumpsum);
         System.debug('Agreement Charges ===>'+ agreementValue);
         System.debug('Orignal Agreement Charges ===>'+ allChargesMap.get('ORIGNALAGREEMENTVALUE'));
+        
         Decimal TotalCardPark = selectedCarPark1 + selectedCarPark2 + selectedCarPark3 + selectedCarPark4 + selectedCarPark5 + selectedCarPark6 + selectedCarPark7;
         System.debug('TotalCardPark Charges ===>'+ TotalCardPark);
         
         if(NPVDiffPSF != 0.0) {
             pDisc.add(pDisc.size()-1,new InventoryCostServices.DiscountWrapper('Payment plan deviation (NPV)', NPVDiffPSF, NPVDiffLumpsum,false,false,true,'NPV'));
         }
+        QuotedOfferValue = QuotationManagementServices.INFormat(agreementValue);
+        system.debug('QuotedOfferValue===>'+ QuotedOfferValue);
         getUpdatedCharges();
+        
+        Decimal AV = allChargesMap.get('AGREEMENTVALUE');
+        system.debug('AV===>'+ AV);
+        
         qPlanWrapperList = new List<QPlanDetailWrapper>(); 
         qPlanWrapperList.addAll(qPlanWrapperListC);
         disableDiscount = true;
@@ -956,7 +987,124 @@ QueryPlanDetails();
         else 
             quoteApprovalMsg += ' & Modifications have been made to the payment plan';
         return null;
+    }*/
+public PageReference savePaymentSchedule() {
+    System.debug('NPV Loss ===> ' + NPVDiffLumpsum_Loss);
+    System.debug('Allotment Charges ===> ' + allotmentCharges);
+    System.debug('Discount Charges ===> ' + discountLumpsum);
+    System.debug('Agreement Charges ===> ' + agreementValue);
+    System.debug('Original Agreement Charges ===> ' + allChargesMap.get('AGREEMENTVALUE'));
+    System.debug('NPVDiffPSF===> ' + NPVDiffPSF);
+    System.debug('NPVDiffLumpsum ===> ' + NPVDiffLumpsum);
+    System.debug('pDisc ===> ' + pDisc);
+    
+    Decimal TotalCardPark = selectedCarPark1 + selectedCarPark2 + selectedCarPark3 + 
+                           selectedCarPark4 + selectedCarPark5 + selectedCarPark6 + selectedCarPark7;
+    System.debug('TotalCardPark Charges ===> ' + TotalCardPark);
+    
+    // Add NPV discount to pDisc list
+    if(NPVDiffPSF != 0.0) {
+        pDisc.add(pDisc.size()-1, new InventoryCostServices.DiscountWrapper(
+            'Payment plan deviation (NPV)', NPVDiffPSF, NPVDiffLumpsum, false, false, true, 'NPV'
+        ));
     }
+    
+    QuotedOfferValue = QuotationManagementServices.INFormat(agreementValue);
+    system.debug('QuotedOfferValue ===> ' + QuotedOfferValue);
+    
+    // Recalculate charges with NPV loss adjustment
+    getUpdatedCharges();
+    
+    Decimal AV = allChargesMap.get('AGREEMENTVALUE');
+    system.debug('AV from allChargesMap ===> ' + AV);
+    
+    // CRITICAL FIX: Recalculate the payment schedule with the adjusted agreement value
+    // This ensures the payment plan matches the final agreement value
+    InventoryCostServices.baseRateVal = baseRate;
+    InventoryCostServices.premiumRateVal = premiumRate;
+    InventoryCostServices.allotmentChargeVal = allotmentChargeLumsum;
+    
+    // Get the updated charges map that includes NPV loss
+    Map<String, Decimal> adjustedChargesMap = InventoryCostServices.getAllCharges(
+        unitId, 
+        allotmentCharges, 
+        discountLumpsum, 
+        subPlanId
+    );
+    
+    System.debug('Adjusted Agreement Value ===> ' + adjustedChargesMap.get('AGREEMENTVALUE'));
+    
+    // Rebuild the payment plan wrappers with correct amounts
+    List<InventoryCostServices.PlanDetailWrapper> pdList = new List<InventoryCostServices.PlanDetailWrapper>();
+    for(QPlanDetailWrapper q : qPlanWrapperListC) {
+        InventoryCostServices.PlanDetailWrapper pdw = new InventoryCostServices.PlanDetailWrapper(
+            q.amount, 
+            q.serviceTax, 
+            q.payPlanRecord
+        );
+        pdList.add(pdw);
+    }
+    
+    // Remove the grand total row
+    if(pdList.size() > 0) {
+        pdList.remove(pdList.size()-1);
+    }
+    
+    // Recalculate with the adjusted charges map to get correct totals
+    List<InventoryCostServices.PlanDetailWrapper> recalculatedPlan = 
+        InventoryCostServices.calculateUpdatedPaymentSchedule(
+            pdList, 
+            adjustedChargesMap, 
+            payplanDetails,
+            unitId
+        );
+    
+    System.debug('Recalculated Plan Size ===> ' + recalculatedPlan.size());
+    
+    // Update qPlanWrapperListC with recalculated values
+    qPlanWrapperListC.clear();
+    for(InventoryCostServices.PlanDetailWrapper pdw : recalculatedPlan) {
+        QPlanDetailWrapper qpw = new QPlanDetailWrapper(
+            pdw.amount,
+            pdw.serviceTax,
+            pdw.totalPay,
+            pdw.payPlanRecord,
+            pdw.taxMap
+        );
+        qPlanWrapperListC.add(qpw);
+    }
+    
+    // Update qPlanWrapperList (this is what's displayed on the page)
+    qPlanWrapperList.clear();
+    qPlanWrapperList.addAll(qPlanWrapperListC);
+    
+    System.debug('qPlanWrapperList size after update: ' + qPlanWrapperList.size());
+    
+    // Verify the total matches
+    Decimal calculatedTotal = 0;
+    for(QPlanDetailWrapper qpw : qPlanWrapperList) {
+        if(qpw.payPlanRecord != null) {
+            calculatedTotal += qpw.amount;
+        }
+    }
+    System.debug('Calculated Total from Payment Plan ===> ' + calculatedTotal);
+    System.debug('Expected Agreement Value ===> ' + adjustedChargesMap.get('AGREEMENTVALUE'));
+    
+    // Reset the edit flags
+    disableDiscount = true;
+    editSchedule = false;
+    scheduleEdited = true;
+    
+    // Update approval message
+    if(quoteApprovalMsg.equals('N/A')) {
+        quoteApprovalMsg = 'This quotation will go for an approval as Modifications have been made to the payment plan';
+    } else if(!quoteApprovalMsg.contains('payment plan')) {
+        quoteApprovalMsg += ' & Modifications have been made to the payment plan';
+    }
+    
+    return null;
+}
+
     
     // ===========END: PLAN EDIT Methods end here
     
@@ -978,6 +1126,8 @@ QueryPlanDetails();
         system.debug('selectedPlan ::: '+selectedPlan );
         pageRef.getParameters().put('discountVal', String.valueOf(CP_DiscountInput));
  		system.debug(' check CP_DiscountInput backtoQuotePage==='+CP_DiscountInput);
+       
+        QuotedOfferValue = QuotationManagementServices.INFormat(agreementValue); 
         // if a plan was already selected, refetch the plan with the updated CV apportionment
         if(selectedPlan != null) {
             Apexpages.currentPage().getParameters().put('subPlanId',selectedPlan);
@@ -1628,6 +1778,7 @@ change1 = true;
         Decimal carParkAmount7;
         Decimal carParkAmount8;
         Decimal carParkAmount9; //Added by Vinay 28-03-2025
+        Decimal carParkAmount10; //Added by Vinay 19-11-2025
       
         if (selectedPlan == null || String.isBlank(selectedPlan)) {
             ApexPages.addMessage(new ApexPages.Message(
@@ -1785,6 +1936,12 @@ change1 = true;
             q.Puzzle_Car_Park_Amount__c = carParkAmount9;
             selectedCarPark9 = Integer.valueOf(q.Puzzle_Car_Park__c);
         }
+        if(q.Stack_Additional_1__c> 0) { //Added by Vinay 19-11-2025
+            carParkAmount10 = proj.Stack_Car_Park_Charges__c* q.Stack_Additional_1__c;
+            System.debug('carParkAmount10: ' + carParkAmount10);
+            q.Stack_Additional_Amount__c = carParkAmount10;
+            selectedCarPark10 = Integer.valueOf(q.Stack_Additional_1__c);
+        }
         if(u.single_car_park_earmarked__c != null) {
             q.single_car_park_earmarked__c = u.single_car_park_earmarked__c;
             carParks += Integer.valueOf(u.single_car_park_earmarked__c);
@@ -1810,7 +1967,7 @@ change1 = true;
             carParks += Integer.valueOf(u.MLCP_Earmarked__c);
         }
         
-        q.No_of_parking__c = carParks + selectedCarPark1 + selectedCarPark2 + selectedCarPark3 + selectedCarPark4 + selectedCarPark5 +selectedCarPark6 +selectedCarPark7+selectedCarPark8+selectedCarPark9;
+        q.No_of_parking__c = carParks + selectedCarPark1 + selectedCarPark2 + selectedCarPark3 + selectedCarPark4 + selectedCarPark5 +selectedCarPark6 +selectedCarPark7+selectedCarPark8+selectedCarPark9+selectedCarPark10;
         
         if(quoteApproversMap.size() > 0) {
             q.Level_One_Approver__c = quoteApproversMap.get('First Level');
@@ -2370,6 +2527,7 @@ q.Other_than_CP_Passback_discount_applied__c = false;
             Decimal carParkAmount7 = 0;
             Decimal carParkAmount8 = 0;
             Decimal carParkAmount9 = 0; //Added by Vinay 28-03-2025
+            Decimal carParkAmount10 = 0; //Added by Vinay 19-11-2025
             
             Decimal car1 = 0;
             Decimal car2 = 0;
@@ -2380,6 +2538,7 @@ q.Other_than_CP_Passback_discount_applied__c = false;
             Decimal car7 = 0;
             Decimal car8 = 0;
             Decimal car9 = 0; //Added by Vinay 28-03-2025
+            Decimal car10 = 0; //Added by Vinay 19-11-2025
             
             if(q.single_car_park_additional__c > 0) {
                 carParkAmount1 = proj.allotment_charges_1__c * q.single_car_park_additional__c;
@@ -2429,6 +2588,10 @@ q.Other_than_CP_Passback_discount_applied__c = false;
                 carParkAmount9 = proj.Allotment_Charges_9__c * q.Puzzle_Car_Park__c;
                 car9 = q.Puzzle_Car_Park__c;
                 //selectedCarPark5 = Integer.valueOf(q.Stack_Additional__c);
+            } 
+            if(q.Stack_Additional_1__c> 0) { //Added by Vinay 19-11-2025
+                carParkAmount10 = proj.Stack_Car_Park_Charges__c * q.Stack_Additional_1__c;
+                car10 = q.Stack_Additional_1__c;
             } 
             
             q = new Quotation__c();
@@ -2480,17 +2643,18 @@ allotmentCharges = 0;*/
             q.Basement_Additional__c = car7;
             q.Podium__c = car8;
             q.Puzzle_Car_Park__c = car9; //Added by Vinay 28-03-2025
-            carParkAmt = carParkAmount1 + carParkAmount2 + carParkAmount3 + carParkAmount4 + carParkAmount5 + carParkAmount6 + carParkAmount7 + carParkAmount8 + carParkAmount9;
+            q.Stack_Additional_1__c = car10; //Added by Vinay 19-11-2025
+            carParkAmt = carParkAmount1 + carParkAmount2 + carParkAmount3 + carParkAmount4 + carParkAmount5 + carParkAmount6 + carParkAmount7 + carParkAmount8 + carParkAmount9 + carParkAmount10;
             
             InventoryCostServices.baseRateVal = baseRate;
             InventoryCostServices.premiumRateVal = premiumRate;
             
             InventoryCostServices.allotmentChargeVal = allotmentChargeLumsum;
             allChargesMap = InventoryCostServices.getAllCharges(unitId,carParkAmt,0.0,subPlanId);
-            quoteUIMap = QuotationManagementServices.getQuotationUIFormat(unitId,carParkAmt,0.0, selectedCarPark1+selectedCarPark2+selectedCarPark3+selectedCarPark4+selectedCarPark5+selectedCarPark6+selectedCarPark7+selectedCarPark8+selectedCarPark9,subPlanId);
-            
+            quoteUIMap = QuotationManagementServices.getQuotationUIFormat(unitId,carParkAmt,0.0, selectedCarPark1+selectedCarPark2+selectedCarPark3+selectedCarPark4+selectedCarPark5+selectedCarPark6+selectedCarPark7+selectedCarPark8+selectedCarPark9+selectedCarPark10,subPlanId);
+            System.debug('quoteUIMap**'+quoteUIMap);
             if(discountVal != null && discountVal > 0){
-                quoteUIMapDisc = QuotationManagementServices.getQuotationUIFormat(unitId,carParkAmt,discountVal, selectedCarPark1 + selectedCarPark2 + selectedCarPark3 + selectedCarPark4 + selectedCarPark5 + selectedCarPark6+selectedCarPark7+selectedCarPark8, subPlanId);
+                quoteUIMapDisc = QuotationManagementServices.getQuotationUIFormat(unitId,carParkAmt,discountVal, selectedCarPark1 + selectedCarPark2 + selectedCarPark3 + selectedCarPark4 + selectedCarPark5 + selectedCarPark6+selectedCarPark7+selectedCarPark8+selectedCarPark10, subPlanId);
             }
             else{
                 quoteUIMapDisc = null;
@@ -2598,7 +2762,7 @@ allotmentCharges = 0;*/
         q.Modified_Premium_Rate__c  = null;
         q.IsModified_Premium_Rate__c = false;
         //quoteApprovalMsg = 'N/A';
-        
+        QuotedOfferValue = QuotationManagementServices.INFormat(agreementValue);
         
     }
     

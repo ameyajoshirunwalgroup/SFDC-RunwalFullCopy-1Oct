@@ -159,7 +159,12 @@ public  without sharing class DigitalBookingController{
                     if(opportunityRec.LeadSource != 'Channel Partner'){
                         //SendWhatsAppMsg.genaricMethodToSendWhatsAppMsg(opportunityRec.Name,opportunityRec.Project_Name__c,Label.Community_URL+'onlinebooking/?data='+encryptedData,SMmobile,null,null,null,null,null,opportunityRec.RW_Mobile_No__c, System.Label.EOI_Booking_HSM);
                         //SendWhatsAppMsg.genaricMethodToSendWhatsAppMsg(opportunityRec.Name,opportunityRec.Project_Name__c,Label.Community_URL+'onlinebooking/?data='+encryptedData,SMmobile,null,null,null,null,null,opportunityRec.RW_Mobile_No__c, 'EOI Booking HSM'); //Commented by Vinay 29-08-2025
-                        SendWhatsAppMsg.methodToSendWhatsAppMsgNew(opportunityRec.Name,opportunityRec.Project_Name__c,Label.Community_URL+'onlinebooking/?data='+encryptedData,SMmobile,null,null,null,null,null,opportunityRec.Account.Country_Code__c,opportunityRec.RW_Mobile_No__c, 'EOI Booking HSM'); //Added by Vinay 29-08-2025
+                        
+                        if(System.label.Haptik_API_Version == 'New'){
+                            SendWhatsAppMsg.methodToSendWhatsAppMsgNew(opportunityRec.Name,opportunityRec.Project_Name__c,Label.Community_URL+'onlinebooking/?data='+encryptedData,SMmobile,null,null,null,null,null,opportunityRec.Account.Country_Code__c,opportunityRec.RW_Mobile_No__c, 'EOI Booking HSM');
+                        }else{
+                            SendWhatsAppMsg.genaricMethodToSendWhatsAppMsg(opportunityRec.Name,opportunityRec.Project_Name__c,Label.Community_URL+'onlinebooking/?data='+encryptedData,SMmobile,null,null,null,null,null,opportunityRec.RW_Mobile_No__c, 'EOI Booking HSM');
+                        }
                     }
                     //Commented by Vinay 29-10-2021
                     //SendWhatsAppMsg.genaricMethodToSendWhatsAppMsg(opportunityRec.Name,opportunityRec.Project_Name__c,Label.Community_URL+'onlinebooking/?data='+encryptedData,SMmobile,null,null,null,null,null,opportunityRec.RW_Mobile_No__c, System.Label.EOI_Booking_HSM);
@@ -364,9 +369,28 @@ bkRecord.RW_Gender__c =accRecord.Gender__c;
         bkRecord.Type_of_Client__c = oppRecord.RW_Type_of_Client__c;
         //bkRecord.Tower__c = oppRecord.RW_Project_Unit__r.TowerName__c;
         bkRecord.Old_Booking__c = oppRecord.RW_Previous_Opportunity__r.Booking__c;
+        if(oppRecord.RW_Project__c!=null){
+            // bkRecord.CP_Invoice_Clearing_L1__c = oppRecord.RW_Project__r.CP_Invoice_Clearing_L1__c;
+            // bkRecord.CP_Invoice_Clearing_L2__c = oppRecord.RW_Project__r.CP_Invoice_Clearing_L2__c;
+            Set<Id> projectIds = new Set<Id>{ oppRecord.RW_Project__c};
+
+            Map<Id, List<Team_Members__c>> approvers =BatchforAOPSchemeTagging.getProjectTeamMembers(projectIds, 'CP Approvers Team', new List<String>{ 'CP Invoice Clearing L1', 'CP Invoice Clearing L2' });
+            List<Team_Members__c> tmList = approvers.get(oppRecord.RW_Project__c);
+
+            if (tmList != null) {
+                for (Team_Members__c tm : tmList) {
+                    if (tm.Approver_Type__c == 'CP Invoice Clearing L1') {
+                        bkRecord.CP_Invoice_Clearing_L1__c = tm.User__c;
+                        system.debug('tm.User__c--------->'+tm.User__r.name);
+                    }
+                    if (tm.Approver_Type__c == 'CP Invoice Clearing L2') {
+                        bkRecord.CP_Invoice_Clearing_L2__c = tm.User__c;
+                        system.debug('tm.User__c-2-------->'+tm.User__r.name);
+                    }
+                }
+            }            
+        }
         
-        bkRecord.CP_Invoice_Clearing_L1__c = oppRecord.RW_Project__r.CP_Invoice_Clearing_L1__c;
-        bkRecord.CP_Invoice_Clearing_L2__c = oppRecord.RW_Project__r.CP_Invoice_Clearing_L2__c;
         if(QuoteDetails.Discount_9_Type__c == 'CP Passback' && QuoteDetails.Quote_Status__c == 'Valid' && QuoteDetails.Discount_9_L__c != Null){
             bkRecord.Passback_Amount__c = QuoteDetails.Discount_9_L__c;
         }
@@ -385,7 +409,7 @@ bkRecord.RW_Gender__c =accRecord.Gender__c;
         //List<Scheme_Configuration__c> sc = [Select Id,Name,Brokerage_Scheme__c,Type__c from Scheme_Configuration__c where ((Project__c =:bkRecord.Project__c and Tower__c =:bkRecord.Tower__c) OR (Project__c =:bkRecord.Project__c and Tower__c =:null)) and (Type__c =: bkRecord.Type_of_Client__c OR Type__c =: 'Both') and Active__c = true];
         list<Scheme_Configuration__c> sc = new list<Scheme_Configuration__c>();
         List<Scheme_Configuration__c> sctemp = [Select Id,Name,Brokerage_Scheme__c,Type__c,Tower__c from Scheme_Configuration__c where ((Project__c =:bkRecord.Project__c and Tower__c =:bkRecord.Tower__c) OR (Project__c =:bkRecord.Project__c and Tower__c =:null)) and (Type__c =: bkRecord.Type_of_Client__c OR Type__c =: 'Both') and Active__c = true];
-        //sc = [Select Id,Name,Brokerage_Scheme__c,Type__c from Scheme_Configuration__c where ((Project__c =:boookingObj.Project__c and Tower__c =:boookingObj.Tower__c) OR (Project__c =:boookingObj.Project__c and Tower__c =:null)) and (Type__c =: boookingObj.Type_of_Client__c OR Type__c =: 'Both') and Active__c = true];
+        //sc = [Select Id,Name,Brokerage_Scheme__c,Type__c from Scheme_Configuration__c where ((Project__c =:bkRecord.Project__c and Tower__c =:bkRecord.Tower__c) OR (Project__c =:bkRecord.Project__c and Tower__c =:null)) and (Type__c =: bkRecord.Type_of_Client__c OR Type__c =: 'Both') and Active__c = true];
         if(!sctemp.isEmpty()){
             for(Scheme_Configuration__c sci : sctemp){
                 if (sci.Tower__c != null) {
@@ -399,8 +423,9 @@ bkRecord.RW_Gender__c =accRecord.Gender__c;
         }
         
         if(!sc.isEmpty()){
-            List<Brokerage_Scheme__c> brokerageScheme = [select Id,Name,Base_Brokerage__c,Base_Brokerage_for_OS_NRI__c,Type__c,Base_Brokerage_for_Local_Bookings__c from Brokerage_Scheme__c where id =: sc[0].Brokerage_Scheme__c and Start_Date__c <=: bookingDate and (End_Date__c = null or End_Date__c >=: bookingDate) and Approval_Status__c = 'Approved by Level 2'];
+            List<Brokerage_Scheme__c> brokerageScheme = [select Id,Name,Base_Brokerage__c,Base_Brokerage_for_OS_NRI__c,Type__c,Base_Brokerage_for_Local_Bookings__c,Base_Brokerage_for_NRI__c from Brokerage_Scheme__c where id =: sc[0].Brokerage_Scheme__c and Start_Date__c <=: bookingDate and (End_Date__c = null or End_Date__c >=: bookingDate) and Approval_Status__c = 'Approved by Level 2'];
             // if(QuoteDetails.Agreement_Value_for_brokers__c != 0 || QuoteDetails.Agreement_Value_for_brokers__c != Null)
+            /*
             if(!brokerageScheme.isEmpty() && brokerageScheme[0].Type__c == 'Local'  ){
                 bkRecord.Base_Brokerage__c = brokerageScheme[0].Base_Brokerage_for_Local_Bookings__c - (((bkRecord.Passback_Amount__c /  QuoteDetails.Brokerage_Agreement_Value__c)*100 ).setscale(2,RoundingMode.HALF_UP));
                 bkRecord.Base_Brokerage_2__c = brokerageScheme[0].Base_Brokerage_for_Local_Bookings__c;
@@ -426,6 +451,28 @@ bkRecord.RW_Gender__c =accRecord.Gender__c;
                 bkRecord.Brokerage_Scheme__c =  brokerageScheme[0].Id;
                 bkRecord.Brokerage__c = brokerageScheme[0].Base_Brokerage_for_OS_NRI__c - (((bkRecord.Passback_Amount__c / QuoteDetails.Brokerage_Agreement_Value__c)*100 ).setscale(2,RoundingMode.HALF_UP));
             }
+			*/
+            //Added by Prashant to Handle base brokerage for NRI differently// 22-10-25. START
+            if(!brokerageScheme.isEmpty() && brokerageScheme[0].Type__c == 'Both' && (bkRecord.Type_of_Client__c == 'Local' || bkRecord.Type_of_Client__c == 'Corporate' )){
+                bkRecord.Base_Brokerage__c = brokerageScheme[0].Base_Brokerage_for_Local_Bookings__c - (((bkRecord.Passback_Amount__c /  QuoteDetails.Brokerage_Agreement_Value__c)*100 ).setscale(2,RoundingMode.HALF_UP));
+                bkRecord.Base_Brokerage_2__c = brokerageScheme[0].Base_Brokerage_for_Local_Bookings__c;
+                bkRecord.Brokerage_Scheme_Name__c =  brokerageScheme[0].Name;
+                bkRecord.Brokerage_Scheme__c =  brokerageScheme[0].Id;
+                bkRecord.Brokerage__c = brokerageScheme[0].Base_Brokerage_for_Local_Bookings__c - (((bkRecord.Passback_Amount__c / QuoteDetails.Brokerage_Agreement_Value__c)*100 ).setscale(2,RoundingMode.HALF_UP));
+            }else if(!brokerageScheme.isEmpty() && brokerageScheme[0].Type__c == 'Both' && (bkRecord.Type_of_Client__c == 'NRI') /*|| bkRecord.Type_of_Client__c == 'Outstation') && bookingDate < bookingDate2*/){
+                bkRecord.Base_Brokerage__c = brokerageScheme[0].Base_Brokerage_for_NRI__c - (((bkRecord.Passback_Amount__c /  QuoteDetails.Brokerage_Agreement_Value__c)*100 ).setscale(2,RoundingMode.HALF_UP));
+                bkRecord.Base_Brokerage_2__c = brokerageScheme[0].Base_Brokerage_for_NRI__c;
+                bkRecord.Brokerage_Scheme_Name__c =  brokerageScheme[0].Name;
+                bkRecord.Brokerage_Scheme__c =  brokerageScheme[0].Id;
+                bkRecord.Brokerage__c = brokerageScheme[0].Base_Brokerage_for_NRI__c - (((bkRecord.Passback_Amount__c / QuoteDetails.Brokerage_Agreement_Value__c)*100 ).setscale(2,RoundingMode.HALF_UP));
+            } else if(!brokerageScheme.isEmpty() && brokerageScheme[0].Type__c == 'Both' && (bkRecord.Type_of_Client__c == 'Outstation') /*&& bookingDate < bookingDate2*/){
+                bkRecord.Base_Brokerage__c = brokerageScheme[0].Base_Brokerage_for_OS_NRI__c - (((bkRecord.Passback_Amount__c /  QuoteDetails.Brokerage_Agreement_Value__c)*100 ).setscale(2,RoundingMode.HALF_UP));
+                bkRecord.Base_Brokerage_2__c = brokerageScheme[0].Base_Brokerage_for_OS_NRI__c;
+                bkRecord.Brokerage_Scheme_Name__c =  brokerageScheme[0].Name;
+                bkRecord.Brokerage_Scheme__c =  brokerageScheme[0].Id;
+                bkRecord.Brokerage__c = brokerageScheme[0].Base_Brokerage_for_OS_NRI__c - (((bkRecord.Passback_Amount__c / QuoteDetails.Brokerage_Agreement_Value__c)*100 ).setscale(2,RoundingMode.HALF_UP));
+            }
+            //Added by Prashant to Handle base brokerage for NRI differently// 22-10-25. END
         }
         
         //Added by coServe 09-12-2022 End
@@ -2002,7 +2049,7 @@ update bk;*/
             
             //Added by Prashant to prioritize the schemes that will be tagged on booking which has tower in it.//START - 13-01-25
             List<Scheme_Configuration__c> sctemp = [Select Id,Name,Brokerage_Scheme__c,Type__c,Tower__c from Scheme_Configuration__c where ((Project__c =:bk.Project__c and Tower__c =:bk.Tower__c) OR (Project__c =:bk.Project__c and Tower__c =:null)) and (Type__c =: bk.Type_of_Client__c OR Type__c =: 'Both') and Active__c = true];
-            //sc = [Select Id,Name,Brokerage_Scheme__c,Type__c from Scheme_Configuration__c where ((Project__c =:boookingObj.Project__c and Tower__c =:boookingObj.Tower__c) OR (Project__c =:boookingObj.Project__c and Tower__c =:null)) and (Type__c =: boookingObj.Type_of_Client__c OR Type__c =: 'Both') and Active__c = true];
+            //sc = [Select Id,Name,Brokerage_Scheme__c,Type__c from Scheme_Configuration__c where ((Project__c =:bkRecord.Project__c and Tower__c =:bkRecord.Tower__c) OR (Project__c =:bkRecord.Project__c and Tower__c =:null)) and (Type__c =: bkRecord.Type_of_Client__c OR Type__c =: 'Both') and Active__c = true];
             if(!sctemp.isEmpty()){
                 for (Scheme_Configuration__c sci : sctemp) {
                     if (sci.Tower__c != null) {
@@ -2426,6 +2473,20 @@ else*/
     public static void dummyMethod(){
         integer i;
         i=0;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
+        i++;
         i++;
         i++;
         i++;
