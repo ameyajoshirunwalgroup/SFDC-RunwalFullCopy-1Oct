@@ -44,19 +44,20 @@ global class LockatedApp_PostSalesWrapper {
 		public String rera_project_name;
 		public String rera_id;
 		public String project_logo;
+        public String company_code;
 		public String unit;
         public String unit_type;
 		public String floor;
 		public String tower;
 		public Decimal agreement_value;
-		public Integer total_demanded;
-		public Integer total_received;
+		public Decimal total_demanded;
+		public Decimal total_received;
 		public String amount_due;
 		public String registration_status;
 		public String registration_amount;
 		public String stamp_duty_status;
 		public String stamp_duty_amount_received;
-		public Integer stamp_duty_amount;
+		public Decimal stamp_duty_amount;
 		public String rm_email;
 		public String rm_mobile;
 		public String rm_name;
@@ -80,11 +81,26 @@ global class LockatedApp_PostSalesWrapper {
 		public List<other_applicants> other_applicants;
 		public stages stages;
 		public List<payment_receipt> payment_receipt;
+        public List<credit_note> credit_note;
 		public List<other_charges> other_charges;
 		public List<milestones> milestones;
         public List<paymentsDue> paymentsDue;
+        public Bank_Details bank_details;
 	}
-    
+
+    public class Bank_Details{
+        public string principle_acc_number;
+        public string principle_acc_name;
+        public string principle_ifsc;
+        public string principle_bank_name;
+        public string principle_branch;
+        public string principle_address;
+        public string gst_acc_number;
+        public string gst_acc_name;
+        public string interest_payable_fav;
+        public string interest_bank_acc_number;
+        public string interest_bank_address;
+    }    
 
 	public class other_applicants {
 		public String date_of_birth;
@@ -118,6 +134,19 @@ global class LockatedApp_PostSalesWrapper {
 	}
 
 	public class payment_receipt {
+		public String fiscal_year;
+		public String sap_document_number;
+		public String company_code;
+		public String sap_payment_advice_no;
+		public Decimal pr_amount;
+		public String pr_date;
+		public String pr_no;
+        public String milestone_name;
+        public String bank_name;
+        public String payment_date;
+	}
+    
+    public class credit_note {
 		public String fiscal_year;
 		public String sap_document_number;
 		public String company_code;

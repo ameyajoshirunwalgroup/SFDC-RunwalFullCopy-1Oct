@@ -43,6 +43,7 @@ global class LockatedApp_ServiceRequests {
                         tkt.createdOn = String.valueOf(cs.CreatedDate);
                         tkt.feedback = '';
                         tkt.rating = '';
+                        
                         tkt.attachment = attMap.get(cs.Id);
                         tkt.comments = caseCommentsMap.get(cs.Id);
                         ticketList.add(tkt);
@@ -90,6 +91,7 @@ global class LockatedApp_ServiceRequests {
                     }else{
                         Case cs = new Case();
                         cs.RW_Case_Type__c = det.caseType;
+                        cs.Origin = 'Lockated App';
                         if(det.caseType == 'Complaint'){
                             cs.Customer_Lifecycle_Touchpoint__c = det.categorType;
                             cs.RW_Complaint_Type__c = det.categoryName;
@@ -98,8 +100,43 @@ global class LockatedApp_ServiceRequests {
                         cs.Description = det.description;
                         //cs.AccountId = det.booking_id;
                         cs.AccountId = bkg[0].Opportunity__r.AccountId;
+                        
+                        
+                        
                         insert cs;
                         //return 'Service Request submitted successfully ' + cs.Id;
+                        if(det.attachment != null && det.attachment != ''){
+                            Attachment attach = new Attachment();
+                            attach.ParentId = cs.Id;
+                            //attach.Name = postType + '.' + resData.fileType;
+                            attach.Name = 'Service Request';
+                            attach.Body = EncodingUtil.base64Decode(det.attachment);
+                            attach.ContentType = 'application/pdf';
+                            insert attach;
+                            
+                            Blob fileBody = EncodingUtil.base64Decode(det.attachment);
+                            
+                            ContentVersion contentVersion = new ContentVersion();
+                            contentVersion.Title = 'Service Request';                     
+                            contentVersion.PathOnClient = 'Service Request.pdf';     
+                            contentVersion.VersionData = fileBody;                
+                            insert contentVersion;
+                            
+                            ContentDocumentLink cdl = new ContentDocumentLink();
+                            cdl.ContentDocumentId = [
+                                SELECT ContentDocumentId 
+                                FROM ContentVersion 
+                                WHERE Id = :contentVersion.Id
+                            ].ContentDocumentId;
+                            
+                            
+                            cdl.LinkedEntityId = cs.Id; 
+                            cdl.ShareType = 'V'; 
+                            cdl.Visibility = 'AllUsers';
+                            insert cdl;
+                            
+                        }
+                       
                         res.responseBody = Blob.valueOf('Service Request submitted successfully');
                         res.statusCode = 200;
                     }
@@ -177,11 +214,14 @@ return caseCommentsMap;
     
     public static Map<String, List<Comment>> getCaseComments(list<String> caseIds){
         
-        List<FeedItem> feeds = [SELECT Id, Body, CreatedBy.Name, CreatedDate, ParentId FROM FeedItem WHERE ParentId =: caseIds];
-        
+        List<FeedItem> feedsList = [SELECT Id, Body, CreatedBy.Name, CreatedDate, ParentId FROM FeedItem WHERE ParentId =: caseIds];
+        List<FeedItem> feeds = new List<FeedItem>();
         List<String> feedIds = new List<String>();
-        for(FeedItem feed : feeds){
-            feedIds.add(feed.Id);
+        for(FeedItem feed : feedsList){
+            if(feed.Body != null){
+                feedIds.add(feed.Id);
+                feeds.add(feed);
+            }
         }
         System.debug('feedIds: ' + feedIds);
         Map<String, Attachmnt> attMap = getCaseCommentAttachments(feedIds);
@@ -203,9 +243,27 @@ return caseCommentsMap;
     }
     
     public static Map<String, Attachmnt> getCaseAttachments(list<String> caseIds){
+        Map<String, Attachmnt> attMap = new Map<String, Attachmnt>();
+        List<Attachment> atts = [SELECT Id, Name, ParentId, ContentType, Body FROM Attachment WHERE ParentId =: caseIds];
+        Map<String, List<Attachment>> caseVsAttachments = new Map<String, List<Attachment>>();
+        for(Attachment at : atts){
+            if(caseVsAttachments.get(at.ParentId) != null){
+                caseVsAttachments.get(at.ParentId).add(at);
+            }else{
+                caseVsAttachments.put(at.ParentId, new List<Attachment>{at});
+            }
+        }
+        for(String csId : caseIds){
+            if(caseVsAttachments.get(csId) != null){
+                Attachmnt attch = new Attachmnt();
+                attch.attchementType = atts[0].ContentType;
+                attch.url = EncodingUtil.base64Encode(caseVsAttachments.get(csId)[0].Body);
+                //attch.url = String.valueOf(atts[0].Body);
+                attMap.put(csId, attch);
+            }
+        }
         
-        //List<Attachment> atts = [SELECT Id, Name, ParentId, ContentType FROM Attachment WHERE ParentId =: caseIds];
-        List<ContentDocumentLink> cdlList = [SELECT Id, ContentDocumentId, LinkedEntityId FROM ContentDocumentLink WHERE LinkedEntityId =: caseIds];
+        /*List<ContentDocumentLink> cdlList = [SELECT Id, ContentDocumentId, LinkedEntityId FROM ContentDocumentLink WHERE LinkedEntityId =: caseIds];
         System.debug('cdlList: ' + cdlList);
         Set<Id> docIds = new Set<Id>();
         Map<String, String> docIdVsCaseId = new Map<String, String>();
@@ -243,7 +301,7 @@ return caseCommentsMap;
                     attMap.put(docIdVsCaseId.get(doc.Id), attch);
                 }
             }
-        }
+        }*/
         
         /*String baseUrl = URL.getOrgDomainURL().toExternalForm();
 Map<String, List<String>> caseAttachmentsMap = new Map<String, List<String>>();
