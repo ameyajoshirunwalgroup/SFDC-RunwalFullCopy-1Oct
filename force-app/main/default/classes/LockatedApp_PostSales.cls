@@ -27,19 +27,19 @@ global without sharing class LockatedApp_PostSales {
                     
                     
                     List<Booking__c> bkgs = [SELECT Id,Name,RW_Registration_Date__c,Booking_Date__c,RW_Key_handover_date__c,No_of_Parking__c,Parking_Type__c,NCF_Status__c,
-                                             Unit_No__r.Type__c,Unit_No__r.Carpet_Area__c,Unit_No__r.Utility_Area__c,Project__r.Name,Project__r.RERA_Certificate_No__c,
+                                             Unit_No__r.Type__c,Unit_No__r.Carpet_Area__c,Unit_No__r.Utility_Area__c,Project__r.Name,Project__r.RERA_Certificate_No__c,Project__r.RW_SAP_Company_Code__c,
                                              Unit_No__r.Name,Unit_No__r.RW_Param3__c,Unit_No__r.RW_Param2__c,Allotment_Premium__c,RW_Total_Demand_Raised__c,Unit_No__r.Deck_Area__c,
                                              RW_Total_Receipt_Amount_Received__c,FBL5N__c,RW_Registration_Status__c,RW_SDR_Status__c,Stamp_duty_Paid__c,Unit_No__r.TowerName__r.RERA_Certificate_No__c,
                                              Unit_No__r.Relationship_Manager__r.did_number_from_user__c,RW_X9_99_Received__c,Unit_No__r.RW_Param4__c,Unit_No__r.Total_RERA_Carpet_Area__c,
                                              RW_Total_SDR_Amount_Payable__c,RW_RM_Email__c,RM_Name__c,Unit_No__r.Relationship_Manager__r.Contact_Number__c,Unit_No__r.Relationship_Manager__r.User__r.MobilePhone,
                                              Sales_Managers__c,Owner.Name,Status__c,Date_of_Occupation_Certificate__c,Sales_Manager__r.Name,Unit_Type__c,Stamp_duty_payable_by_Runwal__c,
                                              Opportunity__r.Account.Country_Code__c,Opportunity__r.Account.Mobile_No__c,Opportunity__r.Account.PersonEmail,Opportunity__r.Account.RW_Email__c,Opportunity__r.Account.LastName,
-                                             Opportunity__r.Account.FirstName,Opportunity__r.SAP_Customer_Number__c,Opportunity__r.Account.Birth_Date__c,
-                                             Opportunity__r.Account.Gender__c,Project__r.WhatsApp_Bot_Project_Image_File_Id__c,RW_Total_TDS_Outstanding__c,
+                                             Opportunity__r.Account.FirstName,Opportunity__r.SAP_Customer_Number__c,Opportunity__r.Account.Birth_Date__c,Unit_No__r.TowerName__c,
+                                             Opportunity__r.Account.Gender__c,Project__r.WhatsApp_Bot_Project_Image_File_Id__c,RW_Total_TDS_Outstanding__c,Quotation__r.PaymentPlan__r.Name,
                                              (SELECT Id,DOB__c,Permanent_Address__c,Address_Proof_Number__c,PancardNo__c,Gender__c,Mobile_Number__c,GSTIN_Number__c,Occupation__c,
                                               Email_Address__c,Last_Name__c,First_Name__c,Applicant_Number__c,Correspondence_Address__c,Organization_Name__c FROM ApplicantDetails__r),
                                              (SELECT Id,Name,RW_Fiscal_Year__c,RW_Company_Code__c,RW_Accounting_Document_Number__c,RW_Payment_Amount__c,RW_Usage_Description__c,RW_Bank_Name__c,
-                                              RW_Payment_Date__c FROM Payment_Details__r WHERE Status__c != 'Reversed' ORDER By CreatedDate DESC),Quotation__r.Registration_Charges__c,Quotation__r.Plan_Type__c,
+                                              RW_Payment_Date__c,RW_Document_Type__c FROM Payment_Details__r WHERE Status__c != 'Reversed' ORDER By CreatedDate DESC),Quotation__r.Registration_Charges__c,Quotation__r.Plan_Type__c,
                                              Quotation__r.Other_Charges_Amount_1__c,Quotation__r.Other_Charges_Desc_1__c,Quotation__r.Other_Charges_Category_1__c,
                                              Quotation__r.Other_Charges_Amount_2__c,Quotation__r.Other_Charges_Desc_2__c,Quotation__r.Other_Charges_Category_2__c,
                                              Quotation__r.Other_Charges_Amount_3__c,Quotation__r.Other_Charges_Desc_3__c,Quotation__r.Other_Charges_Category_3__c,
@@ -64,8 +64,10 @@ global without sharing class LockatedApp_PostSales {
                     
                     if(bkgs.size() > 0){
                         Set<Id> bkIds = new Set<Id>();
+                        Set<Id> towerIds = new Set<Id>();
                         for(Booking__c bkg : bkgs){
                             bkIds.add(bkg.Id);
+                            towerIds.add(bkg.Unit_No__r.TowerName__c);
                         }
                         List<Loan__c> loans = [SELECT Id,HL_RM__c,HL_RM__r.User__r.Name,HL_RM__r.User__r.DID__c,RW_Booking__c,RW_Loan_Record_Status__c FROM Loan__c WHERE RW_Booking__c =: bkIds];
                         Map<String,Loan__c> bkgIdVsLoanMap = new Map<String, Loan__c>();
@@ -82,6 +84,9 @@ global without sharing class LockatedApp_PostSales {
                                 bkgIdVsParkingsMap.put(park.Booking__c, new List<String>{park.Parking__c}); 
                             }
                         }
+                        
+                        List<Tower__c> tower = [SELECT Id, Legal_Entity__c FROM Tower__c WHERE Id =: towerIds];
+                        
                         
                         System.debug('acc.Country_Code__c: ' +bkgs[0].Opportunity__r.Account.Country_Code__c);
                         LockatedApp_PostSalesWrapper.customer cust = new LockatedApp_PostSalesWrapper.customer();
@@ -129,6 +134,7 @@ global without sharing class LockatedApp_PostSales {
                             bkgDet.rera_carpet_area = (bkg.Unit_No__r.Total_RERA_Carpet_Area__c != null)? bkg.Unit_No__r.Total_RERA_Carpet_Area__c : null;
                             bkgDet.project_name = bkg.Project__r.Name;
                             bkgDet.rera_project_name = bkg.Project__r.Name; 
+                            bkgDet.company_code = bkg.Project__r.RW_SAP_Company_Code__c;
                             //bkgDet.rera_id = bkg.Project__r.RERA_Certificate_No__c; 
                             bkgDet.rera_id = bkg.Unit_No__r.TowerName__r.RERA_Certificate_No__c;
                             if(!String.isBlank(bkg.Project__r.WhatsApp_Bot_Project_Image_File_Id__c)){
@@ -147,14 +153,14 @@ global without sharing class LockatedApp_PostSales {
                             bkgDet.floor = bkg.Unit_No__r.RW_Param3__c;
                             bkgDet.tower = bkg.Unit_No__r.RW_Param2__c;
                             bkgDet.agreement_value = (bkg.Allotment_Premium__c != null)? bkg.Allotment_Premium__c : null; 
-                            bkgDet.total_demanded = (bkg.RW_Total_Demand_Raised__c != null)? Integer.valueOf(bkg.RW_Total_Demand_Raised__c) : null; 
-                            bkgDet.total_received = (bkg.RW_Total_Receipt_Amount_Received__c != null)? Integer.valueOf(bkg.RW_Total_Receipt_Amount_Received__c) : null; 
+                            bkgDet.total_demanded = (bkg.RW_Total_Demand_Raised__c != null)? bkg.RW_Total_Demand_Raised__c : null; 
+                            bkgDet.total_received = (bkg.RW_Total_Receipt_Amount_Received__c != null)? bkg.RW_Total_Receipt_Amount_Received__c : null; 
                             bkgDet.amount_due = (bkg.FBL5N__c != null)? String.valueOf(bkg.FBL5N__c) : null; 
                             bkgDet.registration_status = bkg.RW_Registration_Status__c;
                             bkgDet.registration_amount = String.valueOf(bkg.Quotation__r.Registration_Charges__c); 
                             bkgDet.stamp_duty_status = bkg.RW_SDR_Status__c;
                             bkgDet.stamp_duty_amount_received = (bkg.Stamp_duty_Paid__c != null)? String.valueOf(bkg.Stamp_duty_Paid__c) : null;
-                            bkgDet.stamp_duty_amount = (bkg.RW_Total_SDR_Amount_Payable__c != null)? Integer.valueOf(bkg.RW_Total_SDR_Amount_Payable__c) : null;
+                            bkgDet.stamp_duty_amount = (bkg.RW_Total_SDR_Amount_Payable__c != null)? bkg.RW_Total_SDR_Amount_Payable__c : null;
                             bkgDet.rm_email = bkg.RW_RM_Email__c;
                             bkgDet.rm_mobile = bkg.Unit_No__r.Relationship_Manager__r.User__r.MobilePhone;
                             bkgDet.ivr_number = bkg.Unit_No__r.Relationship_Manager__r.did_number_from_user__c;
@@ -163,13 +169,17 @@ global without sharing class LockatedApp_PostSales {
                             bkgDet.ownership = bkg.Owner.Name;
                             bkgDet.status = bkg.Status__c;
                             //bkgDet.booking_amount_paid = '';
-                            bkgDet.payment_plan_type = bkg.Quotation__r.Plan_Type__c;
+                            //bkgDet.payment_plan_type = bkg.Quotation__r.Plan_Type__c;
+                            bkgDet.payment_plan_type = bkg.Quotation__r.PaymentPlan__r.Name;
                             //bkgDet.payment_due_on_before = '';
                             bkgDet.total_outstanding_a = (bkg.FBL5N__c != null)? String.valueOf(bkg.FBL5N__c) : null;
                             bkgDet.total_outstanding_b = (bkg.RW_Total_TDS_Outstanding__c != null)? String.valueOf(bkg.RW_Total_TDS_Outstanding__c) : null;
                             //bkgDet.ncf_url = 'https://runwal--fullcopy.sandbox.my.salesforce-sites.com/crmbotdoc?id='+ bkg.Id + '&doc=ncf';
                             //bkgDet.ncf_url = System.label.Site_Url_New + '/crmbotdoc?id='+ bkg.Id + '&doc=ncf';
-                            bkgDet.ncf_url = NameConfirmationController.generateAndSendForm(bkg.Id);
+                            if(!Test.isRunningTest()){
+                                bkgDet.ncf_url = NameConfirmationController.generateAndSendForm(bkg.Id);
+                            }
+                            
                             //bkgDet.grand_total = String.valueOf(((bkg.FBL5N__c != null)? bkg.FBL5N__c : 0) + ((bkg.RW_Total_TDS_Outstanding__c != null)? bkg.RW_Total_TDS_Outstanding__c : 0));
                             bkgDet.grand_total = (bkg.Allotment_Premium__c != null)? bkg.Allotment_Premium__c : null; 
                             bkgDet.booking_number = bkg.Name;
@@ -215,22 +225,40 @@ global without sharing class LockatedApp_PostSales {
                             bkgDet.stages = stages;
                             
                             List<LockatedApp_PostSalesWrapper.payment_receipt> receipts = new List<LockatedApp_PostSalesWrapper.payment_receipt>();
+                            List<LockatedApp_PostSalesWrapper.credit_note> creditNotes = new List<LockatedApp_PostSalesWrapper.credit_note>();
                             for(RW_Payment_Details__c rec : bkg.Payment_Details__r){
-                                LockatedApp_PostSalesWrapper.payment_receipt receipt = new LockatedApp_PostSalesWrapper.payment_receipt();
-                                receipt.fiscal_year = rec.RW_Fiscal_Year__c;
-                                receipt.sap_document_number = rec.RW_Accounting_Document_Number__c;
-                                receipt.company_code = rec.RW_Company_Code__c;
-                                receipt.sap_payment_advice_no = rec.RW_Accounting_Document_Number__c; 
-                                receipt.pr_amount = rec.RW_Payment_Amount__c;
-                                receipt.pr_date = (rec.RW_Payment_Date__c != null)? String.valueOf(rec.RW_Payment_Date__c) : null;
-                                receipt.pr_no = rec.Name;
-                                receipt.milestone_name = rec.RW_Usage_Description__c;
-                                receipt.bank_name = rec.RW_Bank_Name__c;
-                                receipt.payment_date = String.valueOf(rec.RW_Payment_Date__c);
-                                receipts.add(receipt);
+                                if(rec.RW_Document_Type__c == 'DF' || rec.RW_Document_Type__c == 'DZ' || rec.RW_Document_Type__c == 'DT'){
+                                    LockatedApp_PostSalesWrapper.payment_receipt receipt = new LockatedApp_PostSalesWrapper.payment_receipt();
+                                    receipt.fiscal_year = rec.RW_Fiscal_Year__c;
+                                    receipt.sap_document_number = rec.RW_Accounting_Document_Number__c;
+                                    receipt.company_code = rec.RW_Company_Code__c;
+                                    receipt.sap_payment_advice_no = rec.RW_Accounting_Document_Number__c; 
+                                    receipt.pr_amount = rec.RW_Payment_Amount__c;
+                                    receipt.pr_date = (rec.RW_Payment_Date__c != null)? String.valueOf(rec.RW_Payment_Date__c) : null;
+                                    receipt.pr_no = rec.Name;
+                                    receipt.milestone_name = rec.RW_Usage_Description__c;
+                                    receipt.bank_name = rec.RW_Bank_Name__c;
+                                    receipt.payment_date = String.valueOf(rec.RW_Payment_Date__c);
+                                    receipts.add(receipt);
+                                }else if(rec.RW_Document_Type__c == 'DS'){
+                                    LockatedApp_PostSalesWrapper.credit_note cn = new LockatedApp_PostSalesWrapper.credit_note();
+                                    cn.fiscal_year = rec.RW_Fiscal_Year__c;
+                                    cn.sap_document_number = rec.RW_Accounting_Document_Number__c;
+                                    cn.company_code = rec.RW_Company_Code__c;
+                                    cn.sap_payment_advice_no = rec.RW_Accounting_Document_Number__c; 
+                                    cn.pr_amount = rec.RW_Payment_Amount__c;
+                                    cn.pr_date = (rec.RW_Payment_Date__c != null)? String.valueOf(rec.RW_Payment_Date__c) : null;
+                                    cn.pr_no = rec.Name;
+                                    cn.milestone_name = rec.RW_Usage_Description__c;
+                                    cn.bank_name = rec.RW_Bank_Name__c;
+                                    cn.payment_date = String.valueOf(rec.RW_Payment_Date__c);
+                                    creditNotes.add(cn);
+                                }
+                                
                                 
                             }
                             bkgDet.payment_receipt = receipts;
+                            bkgDet.credit_note = creditNotes;
                             
                             List<LockatedApp_PostSalesWrapper.other_charges> otherCharges = new List<LockatedApp_PostSalesWrapper.other_charges>();
                             if(bkg.Quotation__r.Other_Charges_Category_1__c == 'Other Charges'){
@@ -337,7 +365,7 @@ global without sharing class LockatedApp_PostSales {
                             List<String> bookingAmountDemandIds = new List<String>();
                             
                             for(RW_Demand__c dem : bkg.Demands__r){
-                                dueDate.add(dem.Due_Date__c);
+                                //dueDate.add(dem.Due_Date__c);
                                 LockatedApp_PostSalesWrapper.milestones milestone = new LockatedApp_PostSalesWrapper.milestones();
                                 milestone.sap_demand_no = dem.RW_Billing_Document_Number__c;
                                 milestone.total_amount = dem.Demand_Amount__c;
@@ -352,9 +380,11 @@ global without sharing class LockatedApp_PostSales {
                                 milestones.add(milestone);
                                 
                                 if(dem.RW_Demand_Status__c == 'Due'){
+                                    dueDate.add(dem.Due_Date__c);
                                     LockatedApp_PostSalesWrapper.paymentsDue payDue = new LockatedApp_PostSalesWrapper.paymentsDue();
                                     payDue.milestone = dem.RW_Demand_Milestone__c;
-                                    payDue.milestone_date = String.valueOf(dem.CreatedDate);
+                                    //payDue.milestone_date = String.valueOf(dem.CreatedDate);
+                                    payDue.milestone_date = String.valueOf(dem.Due_Date__c);
                                     payDue.base_amount = String.valueOf(dem.RW_Total_Demand_Amount__c);
                                     payDue.billed_tds = '';
                                     payDue.tds_received = '';
@@ -381,14 +411,15 @@ global without sharing class LockatedApp_PostSales {
                             bkgDet.payment_due_on_before = String.valueOf(latest);
                             if(bookingAmountDemandIds.size() > 0){
                                 List<RW_Demand_Item__c> demItems = [SELECT Id FROM RW_Demand_Item__c WHERE RW_Demand__c =: bookingAmountDemandIds];
-                                List<RW_Payment_Detail_Item__c> bookingReceipts = [SELECT Id, CreatedDate,RW_Amount__c FROM RW_Payment_Detail_Item__c WHERE RW_Demand_Item__c =: demItems ORDER BY CreatedDate ASC];
+                                List<RW_Payment_Detail_Item__c> bookingReceipts = [SELECT Id, CreatedDate,RW_Amount__c,RW_Payment_Details__r.RW_Payment_Date__c FROM RW_Payment_Detail_Item__c WHERE RW_Demand_Item__c =: demItems ORDER BY CreatedDate ASC];
                                 Decimal amount = 0;
                                 if(bookingReceipts.size() > 0){
                                     for(RW_Payment_Detail_Item__c pay : bookingReceipts){
                                         amount += pay.RW_Amount__c;
                                     }
                                     bkgDet.booking_amount_paid = String.valueOf(amount);
-                                    bkgDet.booking_amount_paid_date = String.valueOf(bookingReceipts[0].CreatedDate); 
+                                    //bkgDet.booking_amount_paid_date = String.valueOf(bookingReceipts[0].CreatedDate); 
+                                    bkgDet.booking_amount_paid_date = String.valueOf(bookingReceipts[0].RW_Payment_Details__r.RW_Payment_Date__c); 
                                 }
                             }
                             bkgDet.milestones = milestones;

@@ -20,7 +20,7 @@ public class NameConfirmationController {
                 form.Applicant2_Name = app.Name;
                 form.Applicant2_PAN = app.PancardNo__c;
             }else if(app.Applicant_Number__c == 'Third Applicant'){
-                form.Applicant2_Name = app.Name;
+                form.Applicant3_Name = app.Name;
                 form.Applicant3_PAN = app.PancardNo__c;
             }else if(app.Applicant_Number__c == 'Fourth Applicant'){
                 form.Applicant4_Name = app.Name;
@@ -36,36 +36,51 @@ public class NameConfirmationController {
         System.debug('generateAndSendForm:');
         PageReference pdfPage = Page.NameConfirmationPDF;
         pdfPage.getParameters().put('id', formId);
-        Blob pdfBlob = pdfPage.getContentAsPDF();
+        //Blob pdfBlob = pdfPage.getContentAsPDF();
+        Blob pdfBlob;
+        if(Test.isRunningTest()){
+            pdfBlob = Blob.valueOf('Test');
+        }else{
+             pdfBlob = pdfPage.getContentAsPDF();
+        }
 
-        // Create File
-        /*ContentVersion cv = new ContentVersion(
-            Title = 'NameConfirmation_' + formId,
-            PathOnClient = 'NameConfirmationForm.pdf',
-            VersionData = pdfBlob
-        );
-        insert cv;
-		System.debug('cv: ' + cv);
-        Id docId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :cv.Id].ContentDocumentId;
-		System.debug('docId: ' + docId);
-        // Create Public Link
-        ContentDistribution dist = new ContentDistribution(
-            Name = 'Name Confirmation Form',
-            ContentVersionId = cv.Id,
-            PreferencesAllowViewInBrowser = true,
-            PreferencesAllowOriginalDownload = true
-        );
-        insert dist;
-		System.debug('dist: ' + dist);
-        ContentDistribution distr = [SELECT Id,DistributionPublicUrl FROM ContentDistribution WHERE Id =: dist.Id];
-        System.debug('distr: ' + distr);
-        String linkUrl = distr.DistributionPublicUrl;
-        System.debug('linkUrl: ' + linkUrl);*/
+        List<Booking__c> bkg = [SELECT Id,NCF_Document_Id__c FROM Booking__c WHERE Id =: formId];
+        if(bkg.size() > 0 && bkg[0].NCF_Document_Id__c != null){
+            String ncfUrl = [SELECT DistributionPublicUrl FROM ContentDistribution WHERE ContentDocumentId  =: bkg[0].NCF_Document_Id__c].DistributionPublicUrl;
+            return ncfUrl;
+        }else{
+            ContentVersion cv = new ContentVersion(
+                Title = 'NameConfirmation_' + formId,
+                PathOnClient = 'NameConfirmationForm.pdf',
+                VersionData = pdfBlob
+            );
+            insert cv;
+            System.debug('cv: ' + cv);
+            Id docId = [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :cv.Id].ContentDocumentId;
+            System.debug('docId: ' + docId);
+            
+            ContentDistribution dist = new ContentDistribution(
+                Name = 'Name Confirmation Form',
+                ContentVersionId = cv.Id,
+                PreferencesAllowViewInBrowser = true,
+                PreferencesAllowOriginalDownload = true
+            );
+            insert dist;
+            System.debug('dist: ' + dist);
+            ContentDistribution distr = [SELECT Id,DistributionPublicUrl FROM ContentDistribution WHERE Id =: dist.Id];
+            System.debug('distr: ' + distr);
+            //String linkUrl = distr.DistributionPublicUrl;
+            bkg[0].NCF_Document_Id__c = docId;
+            BookingTriggerHandler.byPass =true;
+            update bkg[0];
+            BookingTriggerHandler.byPass =false;
+            return distr.DistributionPublicUrl;
+        }
         
-        String base64String = EncodingUtil.base64Encode(pdfBlob);
-        System.debug('base64String: ' + base64String);
+        //String base64String = EncodingUtil.base64Encode(pdfBlob);
+        //System.debug('base64String: ' + base64String);
         
-        return base64String;
+        //return base64String;
     }
     
     public class Name_Confirmation{

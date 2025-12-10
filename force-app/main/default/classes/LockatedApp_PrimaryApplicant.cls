@@ -29,7 +29,7 @@ global class LockatedApp_PrimaryApplicant {
                     res.statusCode = 400;
                 }else{
                     system.debug('fullName: ' + resData.customerProfileDetails.PrimaryApplicants[0].fullName);
-                    List<Applicant_Details__c> apps = [SELECT Id,Name,DOB__c,PancardNo__c,GSTIN_Number__c,Organization_Name__c,Designation__c,Permanent_Address__c,Email_Address__c,Mobile_Number__c FROM Applicant_Details__c WHERE Booking__c =: resData.customerProfileDetails.booking AND Applicant_Number__c = 'Primary Applicant'];
+                    List<Applicant_Details__c> apps = [SELECT Id,Name,DOB__c,PancardNo__c,GSTIN_Number__c,Organization_Name__c,Designation__c,Permanent_Address__c,Email_Address__c,Mobile_Number__c,Correspondence_Address__c FROM Applicant_Details__c WHERE Booking__c =: resData.customerProfileDetails.booking AND Applicant_Number__c = 'Primary Applicant'];
                     if(apps.size() > 0){
                         if(!String.isBlank(resData.customerProfileDetails.PrimaryApplicants[0].fullName) && apps[0].Name != resData.customerProfileDetails.PrimaryApplicants[0].fullName)
                             apps[0].Name = resData.customerProfileDetails.PrimaryApplicants[0].fullName;
@@ -49,6 +49,8 @@ global class LockatedApp_PrimaryApplicant {
                             apps[0].Email_Address__c = resData.customerProfileDetails.PrimaryApplicants[0].emailId;
                         if(!String.isBlank(resData.customerProfileDetails.PrimaryApplicants[0].mobileNumber) && apps[0].Mobile_Number__c != resData.customerProfileDetails.PrimaryApplicants[0].mobileNumber)
                             apps[0].Mobile_Number__c = resData.customerProfileDetails.PrimaryApplicants[0].mobileNumber;
+                        if(!String.isBlank(resData.customerProfileDetails.PrimaryApplicants[0].correspondenceAddress) && apps[0].Correspondence_Address__c != resData.customerProfileDetails.PrimaryApplicants[0].correspondenceAddress)
+                            apps[0].Correspondence_Address__c = resData.customerProfileDetails.PrimaryApplicants[0].correspondenceAddress;
                         
                         update apps[0];
                         res.responseBody = Blob.valueOf('Details updated successfully');
@@ -65,6 +67,7 @@ global class LockatedApp_PrimaryApplicant {
                         app.Email_Address__c = resData.customerProfileDetails.PrimaryApplicants[0].emailId;
                         app.Mobile_Number__c = resData.customerProfileDetails.PrimaryApplicants[0].mobileNumber;
                         app.Booking__c = resData.customerProfileDetails.booking;
+                        app.Correspondence_Address__c = resData.customerProfileDetails.PrimaryApplicants[0].correspondenceAddress;
                         res.responseBody = Blob.valueOf('Details updated successfully');
                 		res.statusCode = 200;
                         insert app;

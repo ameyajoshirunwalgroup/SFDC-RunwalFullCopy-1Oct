@@ -11,6 +11,7 @@ global class LockatedApp_FAQs {
         try{
             List<RW_FAQ__c> faqs = [SELECT Id, CreatedDate,RW_Question__c,RW_Answer__c,RW_Active__c,RW_Order__c,Language__c FROM RW_FAQ__c WHERE RW_Active__c = true AND Language__c != null ORDER BY RW_Order__c ASC];
             Map<String, List<FAQ>> faqMap = new Map<String, List<FAQ>>();
+            System.debug('--:' + faqs[0]);
             for(RW_FAQ__c faq : faqs){
                 FAQ f = new FAQ();
                 f.question = faq.RW_Question__c;

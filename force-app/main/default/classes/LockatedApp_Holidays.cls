@@ -143,7 +143,7 @@ global class LockatedApp_Holidays {
         }
         return toReturn;
     }
-    public static List<Date> getMonthlyNthHoliday(Holiday h, date startDate, date endDate){//recurs monthly - something like every second sunday
+    /*public static List<Date> getMonthlyNthHoliday(Holiday h, date startDate, date endDate){//recurs monthly - something like every second sunday
         List<Date> toReturn = new List<Date>();
 
         List<Date> months = getMonths(startDate, endDate);
@@ -160,7 +160,7 @@ global class LockatedApp_Holidays {
                 toReturn.add(d);
         }
        return toReturn;
-    }
+    }*/
     public static List<Date> getWeeklyHoliday(Holiday h, date startDate, date endDate){//something like every sat, sun or tues
         List<Date> toReturn = new List<Date>();
         Integer day = getBitMaskMap().get(h.RecurrenceDayOfWeekMask);
