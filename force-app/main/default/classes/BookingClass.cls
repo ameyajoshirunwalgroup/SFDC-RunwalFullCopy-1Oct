@@ -1202,6 +1202,11 @@ boookingObj.Booking_Date__c = System.Now();
         
         TotalServiceandToken = 0;
         i = 0;
+        if (acc != null && acc.Vehicles_owned__c != null && acc.Vehicles_owned__c != '0' && acc.Vehicles_owned__c != '1' && acc.Vehicles_owned__c != '2' && acc.Vehicles_owned__c != '3' && acc.Vehicles_owned__c != '4') { //Added by Vinay 11-12-2025
+            ApexPages.Message myMsg = new ApexPages.Message(ApexPages.Severity.Error, 'No of Vehicles should be 0 or 1 or 2 or 3 or 4 only');
+            ApexPages.addMessage(myMsg);
+            i = 1;            
+        }
         //Brokerage = 2.25;
         ////Anuja added on 7/1/16 ////////////////
         ///Tandem Covered////
