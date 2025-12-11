@@ -34,8 +34,16 @@ public with sharing class SAPIntegrationServices {
             
             system.debug(oList[0]);
             system.debug(customerNumber+SONumber);
-            if(SONumber != null)
+            if(SONumber != null){
                 oList[0].SalesOrder_Number__c = SONumber;
+                //Added by Vinay 11-12-2025 Start
+                Booking__c bkg = new Booking__c();
+                bkg.Id = oList[0].Booking__c;
+                bkg.SO_Release_Date_in_SAP__c = Date.today();
+				bkg.X4_5_Received__c = true;
+                update bkg;
+                //Added by Vinay 11-12-2025 End
+            }
             
             //if(oList != null)
                 //update oList;
