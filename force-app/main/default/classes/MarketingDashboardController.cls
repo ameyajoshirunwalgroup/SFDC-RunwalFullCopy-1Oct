@@ -135,7 +135,7 @@ public with sharing class MarketingDashboardController {
             }
             if(objName == 'Lead'){
                 qry += ' WHERE RW_Project__c != null AND RW_Project__r.Segment__c != null AND RW_Project__r.RW_Status__c = \'Active\' AND RW_Project__r.Name != \'Runwal Garden City\'';
-                qry += ' AND (NOT LastName Like \'%test%\') AND (NOT FirstName Like \'%test%\') AND (NOT Source_Remarks__c Like \'%Anarock%\') AND (NOT Source_Remarks__c Like \'%Aurum%\')';
+                qry += ' AND (NOT LastName Like \'%test%\') AND (NOT FirstName Like \'%test%\') AND ((Source_Remarks__c Like \'%Anarock%\') OR (Source_Remarks__c Like \'%Aurum%\'))';
                 if(leadSources != null && leadSources.size() > 0){
                     qry += ' AND LeadSource IN: leadSources';
                 }
@@ -618,7 +618,7 @@ public with sharing class MarketingDashboardController {
       
         String qry = 'SELECT RW_Project__r.Segment__c proj, Status st, COUNT(Id) total FROM Lead WHERE RW_Project__c != null AND RW_Project__r.Segment__c != null AND RW_Project__r.Name != \'Runwal Garden City\'';
         //qry += ' AND LeadSource =: source';
-        qry += ' AND (NOT LastName Like \'%test%\') AND (NOT FirstName Like \'%test%\') AND (NOT Source_Remarks__c Like \'%Anarock%\') AND (NOT Source_Remarks__c Like \'%Aurum%\')';
+        qry += ' AND (NOT LastName Like \'%test%\') AND (NOT FirstName Like \'%test%\') AND ((Source_Remarks__c Like \'%Anarock%\') OR (Source_Remarks__c Like \'%Aurum%\'))';
         qry += ' AND Status =: allStatuses';
         if(sources != null && sources.size() > 0){
             qry += ' AND LeadSource IN: sources';
@@ -716,7 +716,7 @@ public with sharing class MarketingDashboardController {
        
         String leadQry = 'SELECT Id,CreatedDate,RW_Project__r.Segment__c,Status,Junk_Date__c FROM Lead';
         leadQry += ' WHERE CreatedDate >= :startDate AND RW_Project__c != null AND RW_Project__r.Segment__c != null AND RW_Project__r.RW_Status__c = \'Active\' AND RW_Project__r.Name != \'Runwal Garden City\'';
-        leadQry += ' AND (NOT LastName Like \'%test%\') AND (NOT FirstName Like \'%test%\') AND (NOT Source_Remarks__c Like \'%Anarock%\') AND (NOT Source_Remarks__c Like \'%Aurum%\')';
+        leadQry += ' AND (NOT LastName Like \'%test%\') AND (NOT FirstName Like \'%test%\') AND ((Source_Remarks__c Like \'%Anarock%\') OR (Source_Remarks__c Like \'%Aurum%\'))';
         if(sources !=  null && sources.size() > 0){
             leadQry += ' AND LeadSource IN: sources';
         }
@@ -849,7 +849,7 @@ public with sharing class MarketingDashboardController {
        
         String leadQry = 'SELECT Id,CreatedDate,RW_Project__r.Segment__c,Status,Junk_Date__c FROM Lead';
         leadQry += ' WHERE RW_Project__c != null AND RW_Project__r.Segment__c != null AND RW_Project__r.RW_Status__c = \'Active\' AND RW_Project__r.Name != \'Runwal Garden City\'';
-        leadQry += ' AND (NOT LastName Like \'%test%\') AND (NOT FirstName Like \'%test%\') AND (NOT Source_Remarks__c Like \'%Anarock%\') AND (NOT Source_Remarks__c Like \'%Aurum%\')';
+        leadQry += ' AND (NOT LastName Like \'%test%\') AND (NOT FirstName Like \'%test%\') AND ((Source_Remarks__c Like \'%Anarock%\') OR (Source_Remarks__c Like \'%Aurum%\'))';
         if(sources != null && sources.size() > 0){
             leadQry += ' AND LeadSource IN: sources';
         }
@@ -1309,7 +1309,7 @@ public with sharing class MarketingDashboardController {
 
         String leadQry = 'SELECT LeadSource src, COUNT(Id) total FROM Lead WHERE IsConverted = false AND LeadSource != null AND CALENDAR_YEAR(CreatedDate) = :selYear';
         leadQry += ' AND RW_Project__r.Segment__c != null AND RW_Project__r.Name != \'Runwal Garden City\'';
-        leadQry += ' AND (NOT LastName Like \'%test%\') AND (NOT FirstName Like \'%test%\') AND (NOT Source_Remarks__c Like \'%Anarock%\') AND (NOT Source_Remarks__c Like \'%Aurum%\')';
+        leadQry += ' AND (NOT LastName Like \'%test%\') AND (NOT FirstName Like \'%test%\') AND ((Source_Remarks__c Like \'%Anarock%\') OR (Source_Remarks__c Like \'%Aurum%\'))';
         if(sources.size() > 0){
             leadQry += ' AND LeadSource IN: sources';
         }else{
@@ -1471,7 +1471,7 @@ public with sharing class MarketingDashboardController {
         
         String leadQry = 'SELECT LeadSource src, COUNT(Id) total FROM Lead WHERE IsConverted = false AND LeadSource != null AND CALENDAR_YEAR(CreatedDate) = :selYear';
         leadQry += ' AND RW_Project__r.Segment__c != null AND RW_Project__r.Name != \'Runwal Garden City\'';
-        leadQry += ' AND (NOT LastName Like \'%test%\') AND (NOT FirstName Like \'%test%\') AND (NOT Source_Remarks__c Like \'%Anarock%\') AND (NOT Source_Remarks__c Like \'%Aurum%\')';
+        leadQry += ' AND (NOT LastName Like \'%test%\') AND (NOT FirstName Like \'%test%\') AND ((Source_Remarks__c Like \'%Anarock%\') OR (Source_Remarks__c Like \'%Aurum%\'))';
         if(sources.size() > 0){
             leadQry += ' AND LeadSource IN: sources';
         }else{
@@ -1935,7 +1935,7 @@ public with sharing class MarketingDashboardController {
         
         String leadQry = 'SELECT RW_Project__r.Segment__c proj, COUNT(Id) total FROM Lead WHERE IsConverted = false AND LeadSource != null';
         leadQry += ' AND RW_Project__r.Segment__c != null AND RW_Project__r.Name != \'Runwal Garden City\'';
-        leadQry += ' AND (NOT LastName Like \'%test%\') AND (NOT FirstName Like \'%test%\') AND (NOT Source_Remarks__c Like \'%Anarock%\') AND (NOT Source_Remarks__c Like \'%Aurum%\')';
+        leadQry += ' AND (NOT LastName Like \'%test%\') AND (NOT FirstName Like \'%test%\') AND ((Source_Remarks__c Like \'%Anarock%\') OR (Source_Remarks__c Like \'%Aurum%\'))';
         if(sources != null && sources.size() > 0){
             leadQry += ' AND LeadSource IN: sources';
         }
@@ -1964,7 +1964,7 @@ public with sharing class MarketingDashboardController {
 
         String qualifiedLeadQry = 'SELECT RW_Project__r.Segment__c proj, COUNT(Id) total FROM Lead WHERE Lead_Qualification__c = \'Qualified\' AND IsConverted = false AND LeadSource != null';
         qualifiedLeadQry += ' AND RW_Project__r.Segment__c != null AND RW_Project__r.Name != \'Runwal Garden City\'';
-        qualifiedLeadQry += ' AND (NOT LastName Like \'%test%\') AND (NOT FirstName Like \'%test%\') AND (NOT Source_Remarks__c Like \'%Anarock%\') AND (NOT Source_Remarks__c Like \'%Aurum%\')';
+        qualifiedLeadQry += ' AND (NOT LastName Like \'%test%\') AND (NOT FirstName Like \'%test%\') AND ((Source_Remarks__c Like \'%Anarock%\') OR (Source_Remarks__c Like \'%Aurum%\'))';
         if(sources != null && sources.size() > 0){
             qualifiedLeadQry += ' AND LeadSource IN: sources';
         }
@@ -2401,7 +2401,7 @@ public with sharing class MarketingDashboardController {
             String leadCSV = 'Id,FirstName,LastName,LeadSource,Status,Project Name,Segment\n';
         
             String qry = 'SELECT Id, FirstName, LastName, LeadSource, Status, RW_Project__r.Segment__c, RW_Project__r.Name FROM Lead WHERE RW_Project__c != null AND RW_Project__r.Segment__c != null AND RW_Project__r.RW_Status__c = \'Active\'';
-            qry += ' AND (NOT LastName Like \'%test%\') AND (NOT FirstName Like \'%test%\') AND (NOT Source_Remarks__c Like \'%Anarock%\') AND (NOT Source_Remarks__c Like \'%Aurum%\')';
+            qry += ' AND (NOT LastName Like \'%test%\') AND (NOT FirstName Like \'%test%\') AND ((Source_Remarks__c Like \'%Anarock%\') OR (Source_Remarks__c Like \'%Aurum%\'))';
             if(project != 'All'){
                 qry += ' AND RW_Project__r.Segment__c =: project';
             }
@@ -2513,7 +2513,7 @@ public with sharing class MarketingDashboardController {
         Date startDate = Date.today().addMonths(-11).toStartOfMonth();
         String leadQry = 'SELECT Id,FirstName,LastName,LeadSource,CreatedDate,RW_Project__r.Segment__c,Status,RW_Project__r.Name FROM Lead';
         leadQry += ' WHERE RW_Project__c != null AND RW_Project__r.Segment__c != null AND RW_Project__r.RW_Status__c = \'Active\' AND RW_Project__r.Name != \'Runwal Garden City\'';
-        leadQry += ' AND (NOT LastName Like \'%test%\') AND (NOT FirstName Like \'%test%\') AND (NOT Source_Remarks__c Like \'%Anarock%\') AND (NOT Source_Remarks__c Like \'%Aurum%\')';
+        leadQry += ' AND (NOT LastName Like \'%test%\') AND (NOT FirstName Like \'%test%\') AND ((Source_Remarks__c Like \'%Anarock%\') OR (Source_Remarks__c Like \'%Aurum%\'))';
         String leadHistoryQry = 'SELECT LeadId, Field, OldValue, NewValue, CreatedDate FROM LeadHistory';
         leadHistoryQry += '  WHERE Field = \'Status\'';
         if(sources != null && sources.size() > 0){
@@ -2642,7 +2642,7 @@ public with sharing class MarketingDashboardController {
         String leadCSV = 'Id,FirstName,LastName,LeadSource,Status,Project Name,Segment\n';
         
         String qry = 'SELECT Id, FirstName, LastName, LeadSource, Status, RW_Project__r.Segment__c, RW_Project__r.Name FROM Lead WHERE IsConverted = false AND RW_Project__c != null AND RW_Project__r.Segment__c != null AND RW_Project__r.RW_Status__c = \'Active\'';
-        qry += ' AND (NOT LastName Like \'%test%\') AND (NOT FirstName Like \'%test%\') AND (NOT Source_Remarks__c Like \'%Anarock%\') AND (NOT Source_Remarks__c Like \'%Aurum%\')';
+        qry += ' AND (NOT LastName Like \'%test%\') AND (NOT FirstName Like \'%test%\') AND ((Source_Remarks__c Like \'%Anarock%\') OR (Source_Remarks__c Like \'%Aurum%\'))';
         if(project != 'All'){
             qry += ' AND RW_Project__r.Segment__c =: project';
         }
